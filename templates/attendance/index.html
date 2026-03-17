@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance - Student Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar-check"></i> Mark Attendance</h2>
+    <a href="{{ url_for('attendance_history', student_id='') }}" class="btn btn-outline-primary">
+        <i class="bi bi-clock-history"></i> View History
+    </a>
+</div>
+
+<!-- Date and Module Selector -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" class="form-control" value="{{ date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Module</label>
+                <select name="module" class="form-select">
+                    {% for mod in modules %}
+                        <option value="{{ mod }}" {% if module == mod %}selected{% endif %}>{{ mod }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Load Students
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Attendance Form -->
+<form method="POST" action="{{ url_for('save_attendance') }}">
+    <input type="hidden" name="date" value="{{ date }}">
+    <input type="hidden" name="module" value="{{ module }}">
+    
+    <div class="card">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Students - {{ module }} ({{ date }})</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Cohort</th>
+                            <th class="text-center">Present</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.id }}</td>
+                            <td>{{ student.name }}</td>
+                            <td>{{ student.cohort }}</td>
+                            <td class="text-center">
+                                <input type="hidden" name="student_ids" value="{{ student.id }}">
+                                <input type="checkbox" name="present_{{ student.id }}" 
+                                       class="form-check-input" 
+                                       {% if student.id in existing and existing[student.id].present %}checked{% endif %}
+                                       style="width: 20px; height: 20px;">
+                            </td>
+                            <td>
+                                <input type="text" name="notes_{{ student.id }}" class="form-control form-control-sm"
+                                       value="{{ existing[student.id].notes if student.id in existing and existing[student.id].notes else '' }}"
+                                       placeholder="Optional notes">
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                No active students found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-lg"></i> Save Attendance
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

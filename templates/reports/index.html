@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Student Manager{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-file-earmark-bar-graph"></i> Reports</h2>
+
+<div class="row g-4">
+    <!-- Student Report -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-person-badge"></i> Individual Student Report</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Generate a comprehensive report for a single student including attendance, assessments, and payment history.</p>
+                <form action="{{ url_for('student_report', id=0) }}" method="GET">
+                    <div class="mb-3">
+                        <label class="form-label">Select Student</label>
+                        <select name="id" class="form-select" required>
+                            <option value="">-- Select Student --</option>
+                            {% for student in students %}
+                                <option value="{{ student.id }}">{{ student.name }} ({{ student.cohort }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-eye"></i> View Report
+                        </button>
+                        <a href="{{ url_for('export_data', type='students') }}" class="btn btn-outline-success">
+                            <i class="bi bi-download"></i> Export All Students to Excel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cohort Report -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-people"></i> Cohort Report</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">View summary statistics for a specific cohort or all students.</p>
+                <form action="{{ url_for('cohort_report') }}" method="GET">
+                    <div class="mb-3">
+                        <label class="form-label">Select Cohort</label>
+                        <select name="cohort" class="form-select">
+                            <option value="">-- All Cohorts --</option>
+                            {% for cohort in cohorts %}
+                                <option value="{{ cohort }}">{{ cohort }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-bar-chart"></i> Generate Cohort Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance Report -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Attendance Report</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Export attendance records for analysis or record keeping.</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('export_data', type='attendance') }}" class="btn btn-outline-success">
+                        <i class="bi bi-download"></i> Export Attendance to Excel
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-calendar"></i> Mark Attendance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assessment Report -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-journal-check"></i> Assessment Report</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Export all assessment records and scores.</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('export_data', type='assessments') }}" class="btn btn-outline-success">
+                        <i class="bi bi-download"></i> Export Assessments to Excel
+                    </a>
+                    <a href="{{ url_for('assessments') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Add Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Statistics</h6>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h3 class="text-primary">{{ stats.total_students }}</h3>
+                <p class="text-muted">Total Students</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-success">{{ stats.active_students }}</h3>
+                <p class="text-muted">Active Students</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-info">{{ stats.attendance_rate }}%</h3>
+                <p class="text-muted">Avg Attendance</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-warning">{{ stats.pass_rate }}%</h3>
+                <p class="text-muted">Pass Rate</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

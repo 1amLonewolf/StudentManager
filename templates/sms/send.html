@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Send SMS - Student Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-chat-dots-fill"></i> Send SMS</h2>
+    <a href="{{ url_for('sms') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to SMS
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Compose Message</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Recipients</label>
+                        <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                            {% for student in students %}
+                            <div class="form-check">
+                                <input type="checkbox" name="recipients" value="{{ student.phone }}" 
+                                       class="form-check-input" id="student_{{ student.id }}"
+                                       {% if not student.phone %}disabled{% endif %}>
+                                <label class="form-check-label" for="student_{{ student.id }}">
+                                    {{ student.name }} - {{ student.phone or 'No phone' }}
+                                    <small class="text-muted">({{ student.cohort }})</small>
+                                </label>
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">No active students found</p>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">Select students to send SMS to</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Message <span class="text-muted">(Max 1600 characters)</span></label>
+                        <textarea name="message" class="form-control" rows="5" maxlength="1600" 
+                                  id="messageInput" required></textarea>
+                        <small class="text-muted">
+                            <span id="charCount">0</span>/1600 characters | 
+                            <span id="smsCount">0</span> SMS unit(s)
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send SMS
+                        </button>
+                        <a href="{{ url_for('sms') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Tips</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li>Keep messages concise (160 chars = 1 SMS)</li>
+                    <li>Include your name/college at the end</li>
+                    <li>Use clear, professional language</li>
+                    <li>Check phone numbers before sending</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-file-text"></i> Templates</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>General Reminder:</strong>
+                    <p class="text-muted small mb-1">
+                        "Dear Student, this is a reminder about [EVENT/DEADLINE]. Please take note. - College Admin"
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <strong>Payment Reminder:</strong>
+                    <p class="text-muted small mb-1">
+                        "Dear Student, you have an outstanding fee balance. Please complete payment to continue your course. - College Admin"
+                    </p>
+                </div>
+                <div>
+                    <strong>Congratulations:</strong>
+                    <p class="text-muted small mb-1">
+                        "Dear Student, congratulations on completing your course! Your certificate is ready for collection. - College Admin"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const messageInput = document.getElementById('messageInput');
+const charCount = document.getElementById('charCount');
+const smsCount = document.getElementById('smsCount');
+
+messageInput.addEventListener('input', function() {
+    const length = this.value.length;
+    charCount.textContent = length;
+    // 1 SMS = 160 chars, multi-part SMS = 153 chars per segment
+    if (length <= 160) {
+        smsCount.textContent = '1';
+    } else {
+        smsCount.textContent = Math.ceil(length / 153);
+    }
+});
+</script>
+{% endblock %}

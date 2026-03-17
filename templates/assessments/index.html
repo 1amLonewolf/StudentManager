@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Assessments - {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-journal-check"></i> Assessments - {{ student.name }}</h2>
+    <div>
+        <a href="{{ url_for('view_student', id=student.id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Student
+        </a>
+        <a href="{{ url_for('add_assessment', student_id=student.id) }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Assessment
+        </a>
+    </div>
+</div>
+
+<!-- Module Summary -->
+<div class="row g-4 mb-4">
+    {% for mod in ['Word', 'Excel', 'PowerPoint', 'Access', 'Internet'] %}
+    <div class="col-md">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                {% set mod_assessments = assessments|selectattr('module', 'equalto', mod)|list %}
+                {% if mod_assessments %}
+                    {% set avg = (mod_assessments|sum(attribute='percentage') / mod_assessments|length)|round(1) %}
+                    <h6 class="card-subtitle mb-2">{{ mod }}</h6>
+                    <h2 class="{% if avg >= 50 %}text-success{% else %}text-danger{% endif %}">{{ avg }}%</h2>
+                    <small class="text-muted">{{ mod_assessments|length }} assessment(s)</small>
+                {% else %}
+                    <h6 class="card-subtitle mb-2">{{ mod }}</h6>
+                    <h2 class="text-muted">-</h2>
+                    <small class="text-muted">Not assessed</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Assessments Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Module</th>
+                        <th>Type</th>
+                        <th>Score</th>
+                        <th>Percentage</th>
+                        <th>Date</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assessment in assessments %}
+                    <tr>
+                        <td><strong>{{ assessment.module }}</strong></td>
+                        <td>{{ assessment.assessment_type|capitalize }}</td>
+                        <td>{{ assessment.score }}/{{ assessment.max_score }}</td>
+                        <td>
+                            <span class="{% if assessment.passed %}text-success{% else %}text-danger{% endif %}">
+                                {{ assessment.percentage }}%
+                            </span>
+                        </td>
+                        <td>{{ assessment.date_taken.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ assessment.remarks or '-' }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_assessment', id=assessment.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        onclick="return confirm('Delete this assessment?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox display-4"></i>
+                            <p class="mt-2">No assessments recorded yet</p>
+                            <a href="{{ url_for('add_assessment', student_id=student.id) }}" class="btn btn-primary">
+                                Add First Assessment
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

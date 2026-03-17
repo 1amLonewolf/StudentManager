@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Student Report - {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-pdf"></i> Student Report</h2>
+    <div>
+        <a href="{{ url_for('view_student', id=student.id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Student
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="bi bi-printer"></i> Print Report
+        </button>
+    </div>
+</div>
+
+<!-- Student Info Header -->
+<div class="card mb-4 no-print">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>{{ student.name }}</h3>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-calendar"></i> {{ student.cohort }} | 
+                    <i class="bi bi-clock"></i> Enrolled: {{ report.student.enrollment_date }} |
+                    <i class="bi bi-badge-check"></i> {{ report.student.status }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <p class="mb-1"><i class="bi bi-telephone"></i> {{ report.student.phone }}</p>
+                <p class="mb-1"><i class="bi bi-envelope"></i> {{ report.student.email }}</p>
+                <p class="mb-0"><i class="bi bi-card-text"></i> ID: {{ report.student.id_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Attendance Rate</h6>
+                <h1 class="{% if report.attendance.rate >= 85 %}text-success{% elif report.attendance.rate >= 70 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ report.attendance.rate }}%
+                </h1>
+                <p class="small text-muted mb-0">
+                    {{ report.attendance.present_days }} present / {{ report.attendance.total_days }} total
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Average Score</h6>
+                <h1 class="{% if report.performance.average_score >= 50 %}text-success{% else %}text-danger{% endif %}">
+                    {{ report.performance.average_score }}%
+                </h1>
+                <p class="small text-muted mb-0">
+                    Grade: {{ report.performance.grade }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Modules Passed</h6>
+                <h1 class="text-primary">{{ report.performance.modules_passed }}/{{ report.performance.modules_total }}</h1>
+                <p class="small text-muted mb-0">
+                    {% if report.performance.modules_total > 0 %}
+                        {{ report.performance.modules_passed|int / report.performance.modules_total|int * 100|round }}% pass rate
+                    {% else %}
+                        Not assessed
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Payment Status</h6>
+                <h1 class="text-success">KES {{ report.payments.total_paid|int }}</h1>
+                <p class="small text-muted mb-0">
+                    Pending: KES {{ report.payments.pending|int }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Module Performance Table -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-journal-check"></i> Module Assessments</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Module</th>
+                        <th>Type</th>
+                        <th>Score</th>
+                        <th>Percentage</th>
+                        <th>Date</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assessment in report.assessments %}
+                    <tr>
+                        <td><strong>{{ assessment.module }}</strong></td>
+                        <td>{{ assessment.type }}</td>
+                        <td>{{ assessment.score }}/{{ assessment.max_score }}</td>
+                        <td>
+                            <span class="{% if assessment.percentage >= 50 %}text-success{% else %}text-danger{% endif %}">
+                                {{ assessment.percentage }}%
+                            </span>
+                        </td>
+                        <td>{{ assessment.date }}</td>
+                        <td>{{ assessment.remarks }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No assessments recorded</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Summary by Module -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-calendar-check"></i> Attendance by Module</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for mod in ['Word', 'Excel', 'PowerPoint', 'Access', 'Internet'] %}
+            <div class="col-md">
+                <div class="text-center">
+                    <h6 class="text-muted">{{ mod }}</h6>
+                    {% set mod_attendance = student.attendances|selectattr('module', 'equalto', mod)|list %}
+                    {% if mod_attendance %}
+                        {% set present = mod_attendance|selectattr('present')|list|length %}
+                        {% set rate = (present / mod_attendance|length * 100)|round %}
+                        <h3 class="{% if rate >= 85 %}text-success{% elif rate >= 70 %}text-warning{% else %}text-danger{% endif %}">
+                            {{ rate }}%
+                        </h3>
+                        <small>{{ present }}/{{ mod_attendance|length }}</small>
+                    {% else %}
+                        <h3 class="text-muted">-</h3>
+                        <small>No records</small>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Payment History -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-cash-stack"></i> Payment History</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in report.payments.transactions %}
+                    <tr>
+                        <td>{{ payment.date }}</td>
+                        <td class="text-success"><strong>KES {{ payment.amount }}</strong></td>
+                        <td>{{ payment.method }}</td>
+                        <td>{{ payment.reference }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No payments recorded</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-light">
+                    <tr>
+                        <th>Total Paid</th>
+                        <td class="text-success"><strong>KES {{ report.payments.total_paid|int }}</strong></td>
+                        <td>Pending</td>
+                        <td class="text-warning"><strong>KES {{ report.payments.pending|int }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Print Styles -->
+<style>
+@media print {
+    .no-print { display: none !important; }
+    .card { border: 1px solid #ddd !important; box-shadow: none !important; }
+}
+</style>
+{% endblock %}

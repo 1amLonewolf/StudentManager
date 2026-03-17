@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Certificates - Student Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-award-fill"></i> Certificates</h2>
+    <a href="{{ url_for('generate_certificate_page') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Generate Certificates
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Certificate #</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Grade</th>
+                        <th>Issue Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cert in certificates.items %}
+                    <tr>
+                        <td><code>{{ cert.certificate_number }}</code></td>
+                        <td>
+                            <a href="{{ url_for('view_student', id=cert.student_id) }}">
+                                {{ cert.student.name }}
+                            </a>
+                        </td>
+                        <td>{{ cert.course_name }}</td>
+                        <td>
+                            {% if cert.grade == 'Distinction' %}
+                                <span class="badge bg-success">{{ cert.grade }}</span>
+                            {% elif cert.grade == 'Credit' %}
+                                <span class="badge bg-primary">{{ cert.grade }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ cert.grade }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ cert.issue_date.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('download_certificate', id=cert.id) }}" class="btn btn-outline-primary" title="Download">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <a href="{{ url_for('print_certificate', id=cert.id) }}" class="btn btn-outline-success" title="Print" target="_blank">
+                                    <i class="bi bi-printer"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="bi bi-award display-4"></i>
+                            <p class="mt-2">No certificates generated yet</p>
+                            <a href="{{ url_for('generate_certificate_page') }}" class="btn btn-primary">
+                                Generate First Certificate
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if certificates.pages > 1 %}
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination mb-0 justify-content-center">
+                <li class="page-item {% if not certificates.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('certificates', page=certificates.prev_num) }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                
+                {% for page_num in certificates.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == certificates.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('certificates', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not certificates.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('certificates', page=certificates.next_num) }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
