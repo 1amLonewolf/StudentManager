@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1e3a5f; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .details { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #1e3a5f; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { display: inline-block; padding: 10px 20px; background: #1e3a5f; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Welcome to {{ course_name }}!</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear <strong>{{ student.name }}</strong>,</p>
+            
+            <p>We're excited to have you join us for the <strong>{{ course_name }}</strong> course!</p>
+            
+            <div class="details">
+                <h3>Your Enrollment Details:</h3>
+                <p><strong>Cohort:</strong> {{ student.cohort }}</p>
+                <p><strong>Enrollment Date:</strong> {{ student.enrollment_date.strftime('%d %B %Y') }}</p>
+                <p><strong>Course Duration:</strong> {{ duration }} months</p>
+            </div>
+            
+            <h3>Course Modules:</h3>
+            <ul>
+                <li>📄 Microsoft Word</li>
+                <li>📊 Microsoft Excel</li>
+                <li>📽️ Microsoft PowerPoint</li>
+                <li>🗄️ Microsoft Access</li>
+                <li>📰 Microsoft Publisher</li>
+                <li>🌐 Internet Basics</li>
+            </ul>
+            
+            <p>We're committed to helping you succeed. If you have any questions, please don't hesitate to contact us.</p>
+            
+            <p>Best regards,<br>
+            <strong>Course Administrator</strong><br>
+            {{ course_name }}</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{ student.enrollment_date.year }} {{ course_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -6,10 +6,10 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-chat-dots-fill"></i> SMS Messages</h2>
     <div>
-        <a href="{{ url_for('send_sms_page') }}" class="btn btn-primary">
+        <a href="{{ url_for('sms.send') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> Send SMS
         </a>
-        <a href="{{ url_for('send_attendance_reminder') }}" class="btn btn-warning">
+        <a href="{{ url_for('sms.send_reminder') }}" class="btn btn-warning">
             <i class="bi bi-exclamation-triangle"></i> Send Attendance Reminder
         </a>
     </div>
@@ -88,7 +88,7 @@
                         <p class="text-muted small mb-2">
                             "Dear Student, your attendance is below 70%. Please attend classes regularly to complete your course successfully. - Computer Packages Course"
                         </p>
-                        <a href="{{ url_for('send_attendance_reminder') }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ url_for('sms.send_reminder') }}" class="btn btn-sm btn-outline-primary">
                             Send to Low Attendance Students
                         </a>
                     </div>
@@ -101,7 +101,7 @@
                         <p class="text-muted small mb-2">
                             "Dear Student, reminder: Your Computer Packages exam is on [DATE]. Please be punctual. - College Admin"
                         </p>
-                        <a href="{{ url_for('send_sms_page') }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ url_for('sms.send') }}" class="btn btn-sm btn-outline-primary">
                             Send Custom SMS
                         </a>
                     </div>

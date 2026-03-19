@@ -134,7 +134,7 @@
         <div class="card h-100">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="mb-0"><i class="bi bi-person-plus"></i> Recent Students</h6>
-                <a href="{{ url_for('add_student') }}" class="btn btn-sm btn-primary">Add New</a>
+                <a href="{{ url_for('students.add') }}" class="btn btn-sm btn-primary">Add New</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -150,7 +150,7 @@
                             {% for student in recent_students %}
                             <tr>
                                 <td>
-                                    <a href="{{ url_for('view_student', id=student.id) }}">
+                                    <a href="{{ url_for('students.view', id=student.id) }}">
                                         {{ student.name }}
                                     </a>
                                 </td>
@@ -193,7 +193,7 @@
                                 <td>{{ student.cohort }}</td>
                                 <td>{{ student.enrollment_date.strftime('%d/%m/%Y') }}</td>
                                 <td>
-                                    <a href="{{ url_for('view_student', id=student.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ url_for('students.view', id=student.id) }}" class="btn btn-sm btn-outline-primary">
                                         View
                                     </a>
                                 </td>

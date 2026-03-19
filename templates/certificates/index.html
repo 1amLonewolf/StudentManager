@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-award-fill"></i> Certificates</h2>
-    <a href="{{ url_for('generate_certificate_page') }}" class="btn btn-primary">
+    <a href="{{ url_for('certificates.generate') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Generate Certificates
     </a>
 </div>
@@ -29,7 +29,7 @@
                     <tr>
                         <td><code>{{ cert.certificate_number }}</code></td>
                         <td>
-                            <a href="{{ url_for('view_student', id=cert.student_id) }}">
+                            <a href="{{ url_for('students.view', id=cert.student_id) }}">
                                 {{ cert.student.name }}
                             </a>
                         </td>
@@ -46,10 +46,10 @@
                         <td>{{ cert.issue_date.strftime('%d/%m/%Y') }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ url_for('download_certificate', id=cert.id) }}" class="btn btn-outline-primary" title="Download">
+                                <a href="{{ url_for('certificates.download', id=cert.id) }}" class="btn btn-outline-primary" title="Download">
                                     <i class="bi bi-download"></i>
                                 </a>
-                                <a href="{{ url_for('print_certificate', id=cert.id) }}" class="btn btn-outline-success" title="Print" target="_blank">
+                                <a href="{{ url_for('certificates.print', id=cert.id) }}" class="btn btn-outline-success" title="Print" target="_blank">
                                     <i class="bi bi-printer"></i>
                                 </a>
                             </div>
@@ -60,7 +60,7 @@
                         <td colspan="6" class="text-center text-muted py-4">
                             <i class="bi bi-award display-4"></i>
                             <p class="mt-2">No certificates generated yet</p>
-                            <a href="{{ url_for('generate_certificate_page') }}" class="btn btn-primary">
+                            <a href="{{ url_for('certificates.generate') }}" class="btn btn-primary">
                                 Generate First Certificate
                             </a>
                         </td>

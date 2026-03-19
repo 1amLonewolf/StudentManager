@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin
+from flask_migrate import Migrate
 from datetime import datetime
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+migrate = Migrate()
 
 # Association table for students and courses (many-to-many)
 student_courses = db.Table('student_courses',
@@ -14,15 +16,53 @@ student_courses = db.Table('student_courses',
 )
 
 class User(UserMixin, db.Model):
-    """Admin/Instructor users"""
+    """Admin/Instructor users with role-based access"""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(20), default='admin')  # admin, instructor
+    role = db.Column(db.String(20), default='instructor')  # admin, instructor, receptionist
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     
+    # Custom permissions (JSON format)
+    # Example: {"can_access_attendance": true, "can_access_payments": false}
+    custom_permissions = db.Column(db.Text, default='{}')
+
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.username} ({self.role})>'
+    
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+    
+    @property
+    def is_instructor(self):
+        return self.role in ['admin', 'instructor']
+    
+    @property
+    def is_receptionist(self):
+        return self.role in ['admin', 'receptionist']
+    
+    def get_permissions(self):
+        """Get custom permissions as dict"""
+        import json
+        try:
+            return json.loads(self.custom_permissions or '{}')
+        except:
+            return {}
+    
+    def set_permission(self, key, value):
+        """Set a specific permission"""
+        import json
+        perms = self.get_permissions()
+        perms[key] = value
+        self.custom_permissions = json.dumps(perms)
+    
+    def has_permission(self, key):
+        """Check if user has specific permission"""
+        perms = self.get_permissions()
+        return perms.get(key, False)
 
 class Course(db.Model):
     """Available courses (e.g., Computer Packages)"""
@@ -168,8 +208,8 @@ class SMSLog(db.Model):
 # Initialize login_manager
 def init_login_manager(app):
     login_manager.init_app(app)
-    login_manager.login_view = 'login'
-    
+    login_manager.login_view = 'auth.login'
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))

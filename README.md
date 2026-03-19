@@ -5,7 +5,7 @@ A simple, practical student management system designed for a computer college of
 ## Features
 
 - **Student Management**: Register students, track cohorts, manage contact info
-- **Attendance Tracking**: Daily attendance per module (Word, Excel, PowerPoint, Access, Internet)
+- **Attendance Tracking**: Daily attendance per module (Word, Excel, PowerPoint, Access, Publisher, Internet)
 - **Assessments**: Record and track scores for each module
 - **Certificates**: Generate completion certificates with student names and grades
 - **Payment Tracking**: Track course fee payments and balances

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #28a745; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .receipt { background: white; padding: 20px; margin: 15px 0; border: 2px solid #28a745; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .receipt-row.total { font-weight: bold; font-size: 18px; border-top: 2px solid #28a745; border-bottom: none; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Payment Receipt</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear <strong>{{ student.name }}</strong>,</p>
+            <p>Thank you for your payment. Here are the details:</p>
+            
+            <div class="receipt">
+                <div class="receipt-row">
+                    <span>Payment Amount:</span>
+                    <strong>KES {{ payment.amount }}</strong>
+                </div>
+                <div class="receipt-row">
+                    <span>Payment Date:</span>
+                    <span>{{ payment.payment_date.strftime('%d %B %Y') }}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Payment Method:</span>
+                    <span>{{ payment.payment_method.capitalize() }}</span>
+                </div>
+                {% if payment.reference %}
+                <div class="receipt-row">
+                    <span>Reference:</span>
+                    <span>{{ payment.reference }}</span>
+                </div>
+                {% endif %}
+                <div class="receipt-row total">
+                    <span>Total Paid:</span>
+                    <span>KES {{ student.total_paid }}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Pending Balance:</span>
+                    <span>KES {{ max(0, course_fee - student.total_paid) }}</span>
+                </div>
+            </div>
+            
+            <p>This serves as your official receipt for this payment.</p>
+            
+            <p>Best regards,<br>
+            <strong>Accounts Department</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{ student.enrollment_date.year }} Student Manager. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

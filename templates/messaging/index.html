@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Messaging - Student Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-chat-dots"></i> Messaging Center</h2>
+    <div>
+        <a href="{{ url_for('messaging.send_low_attendance_alerts') }}" class="btn btn-warning">
+            <i class="bi bi-exclamation-triangle"></i> Send Low Attendance Alerts
+        </a>
+    </div>
+</div>
+
+<!-- Messaging Options -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-envelope"></i> Email Messaging</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Send emails to individual students or in bulk. Free via Gmail SMTP.</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle text-success"></i> Welcome emails</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Attendance alerts</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Monthly progress reports</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Payment receipts</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Certificate notifications</li>
+                </ul>
+                <div class="alert alert-info">
+                    <small><i class="bi bi-info-circle"></i> Configure email settings in <code>.env</code> file</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp Messaging</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Quick message students via WhatsApp Click-to-Chat. Free and instant!</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle text-success"></i> No API required</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Uses your phone's WhatsApp</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Pre-filled messages</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Send to individual students</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Rich media support</li>
+                </ul>
+                <div class="alert alert-success">
+                    <small><i class="bi bi-lightning"></i> Click any student's WhatsApp button to message instantly</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student List with Quick Actions -->
+<div class="card">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="bi bi-people"></i> Quick Message Students</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Attendance</th>
+                        <th>Quick Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td><strong>{{ student.name }}</strong></td>
+                        <td>{{ student.email or '-' }}</td>
+                        <td>{{ student.phone or '-' }}</td>
+                        <td>
+                            {% if student.attendance_rate < 70 %}
+                                <span class="badge bg-danger">{{ student.attendance_rate }}%</span>
+                            {% elif student.attendance_rate < 85 %}
+                                <span class="badge bg-warning">{{ student.attendance_rate }}%</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ student.attendance_rate }}%</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-chat-dots"></i> Message
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if student.email %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('messaging.send_email', student_id=student.id) }}">
+                                            <i class="bi bi-envelope text-primary"></i> Send Email
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if student.phone %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('messaging.send_whatsapp', student_id=student.id, message='Hello ' + student.name) }}" target="_blank">
+                                            <i class="bi bi-whatsapp text-success"></i> Send WhatsApp
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if student.email and student.phone %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="sendBoth('{{ student.id }}', '{{ student.name }}'); return false;">
+                                            <i class="bi bi-send text-info"></i> Send Both
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('students.view', id=student.id) }}">
+                                            <i class="bi bi-person text-secondary"></i> View Profile
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No students found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function sendBoth(studentId, studentName) {
+    // Open email in new tab
+    const emailUrl = `/messaging/email/${studentId}`;
+    window.open(emailUrl, '_blank');
+    
+    // Open WhatsApp after a short delay
+    setTimeout(() => {
+        const whatsappUrl = `/messaging/whatsapp/${studentId}?message=${encodeURIComponent('Hello ' + studentName)}`;
+        window.open(whatsappUrl, '_blank');
+    }, 500);
+}
+</script>
+{% endblock %}

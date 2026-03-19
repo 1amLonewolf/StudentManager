@@ -75,9 +75,9 @@
                     <div class="d-flex gap-2">
                         {{ form.submit(class="btn btn-primary") }}
                         {% if student %}
-                            <a href="{{ url_for('assessments', student_id=student.id) }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ url_for('assessments.index', student_id=student.id) }}" class="btn btn-secondary">Cancel</a>
                         {% else %}
-                            <a href="{{ url_for('students') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ url_for('students.index') }}" class="btn btn-secondary">Cancel</a>
                         {% endif %}
                     </div>
                 </form>

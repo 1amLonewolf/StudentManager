@@ -14,7 +14,8 @@ class StudentForm(FlaskForm):
     id_number = StringField('ID Number', validators=[Optional(), Length(max=50)])
     gender = SelectField('Gender', choices=[('', 'Select'), ('Male', 'Male'), ('Female', 'Female')])
     cohort = StringField('Cohort (e.g., Jan-Mar 2026)', validators=[DataRequired(), Length(max=50)])
-    course_id = SelectField('Course', coerce=int, validators=[Optional()])
+    enrollment_date = DateField('Enrollment Date', validators=[DataRequired()])
+    course_id = SelectField('Course', coerce=int, validators=[Optional()], choices=[])
     status = SelectField('Status', choices=[('active', 'Active'), ('completed', 'Completed'), ('dropped', 'Dropped')], default='active')
     submit = SubmitField('Save Student')
 
@@ -26,6 +27,7 @@ class AttendanceForm(FlaskForm):
         ('Excel', 'MS Excel'),
         ('PowerPoint', 'MS PowerPoint'),
         ('Access', 'MS Access'),
+        ('Publisher', 'MS Publisher'),
         ('Internet', 'Internet Basics')
     ])
     present = BooleanField('Present')
@@ -34,12 +36,13 @@ class AttendanceForm(FlaskForm):
 
 class AssessmentForm(FlaskForm):
     student_id = IntegerField('Student ID', validators=[DataRequired()])
-    course_id = SelectField('Course', coerce=int, validators=[DataRequired()])
+    course_id = SelectField('Course', coerce=int, validators=[DataRequired()], choices=[])
     module = SelectField('Module', choices=[
         ('Word', 'MS Word'),
         ('Excel', 'MS Excel'),
         ('PowerPoint', 'MS PowerPoint'),
         ('Access', 'MS Access'),
+        ('Publisher', 'MS Publisher'),
         ('Internet', 'Internet Basics')
     ], validators=[DataRequired()])
     score = IntegerField('Score', validators=[DataRequired(), NumberRange(min=0, max=100)])

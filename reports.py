@@ -7,12 +7,13 @@ from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
-def generate_student_report(student):
+def generate_student_report(student, course_fee=4000):
     """
     Generate comprehensive report for a student
-    
-    Returns:
-        dict with all report data
+
+    Args:
+        student: Student object
+        course_fee: Course fee (default 4000 KES)
     """
     report = {
         'student': {
@@ -39,7 +40,7 @@ def generate_student_report(student):
         },
         'payments': {
             'total_paid': student.total_paid,
-            'pending': 0,  # Assuming course fee is 10000
+            'pending': 0,  # Calculated below using course_fee
             'transactions': []
         }
     }
@@ -71,8 +72,7 @@ def generate_student_report(student):
         report['performance']['grade'] = 'Fail'
     
     # Payment details
-    COURSE_FEE = 10000
-    report['payments']['pending'] = max(0, COURSE_FEE - student.total_paid)
+    report['payments']['pending'] = max(0, course_fee - student.total_paid)
     
     for payment in student.payments:
         report['payments']['transactions'].append({

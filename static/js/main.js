@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Auto-select current month in date inputs
+    // Auto-select current date for enrollment date fields
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(function(input) {
         if (!input.value) {

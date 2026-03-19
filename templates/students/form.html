@@ -57,7 +57,7 @@
                                 <span class="text-danger small">{{ error }}</span>
                             {% endfor %}
                         </div>
-                        
+
                         <div class="col-md-4 mb-3">
                             {{ form.cohort.label(class="form-label") }}
                             {{ form.cohort(class="form-control", placeholder="e.g., Jan-Mar 2026") }}
@@ -65,29 +65,39 @@
                                 <span class="text-danger small">{{ error }}</span>
                             {% endfor %}
                         </div>
-                        
+
                         <div class="col-md-4 mb-3">
+                            {{ form.enrollment_date.label(class="form-label") }}
+                            {{ form.enrollment_date(class="form-control", type="date") }}
+                            {% for error in form.enrollment_date.errors %}
+                                <span class="text-danger small">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             {{ form.course_id.label(class="form-label") }}
                             {{ form.course_id(class="form-select") }}
                             {% for error in form.course_id.errors %}
                                 <span class="text-danger small">{{ error }}</span>
                             {% endfor %}
                         </div>
+
+                        {% if student %}
+                        <div class="col-md-6 mb-3">
+                            {{ form.status.label(class="form-label") }}
+                            {{ form.status(class="form-select") }}
+                            {% for error in form.status.errors %}
+                                <span class="text-danger small">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
-                    {% if student %}
-                    <div class="mb-3">
-                        {{ form.status.label(class="form-label") }}
-                        {{ form.status(class="form-select") }}
-                        {% for error in form.status.errors %}
-                            <span class="text-danger small">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
                     
                     <div class="d-flex gap-2">
                         {{ form.submit(class="btn btn-primary") }}
-                        <a href="{{ url_for('students') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ url_for('students.index') }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

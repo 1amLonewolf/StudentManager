@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Manager{% endblock %}</title>
-    
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -25,36 +28,106 @@
                 <h5 class="mb-0"><i class="bi bi-mortarboard-fill"></i> Student Manager</h5>
             </div>
             <div class="list-group list-group-flush">
-                <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <a href="{{ url_for('main.dashboard') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <a href="{{ url_for('students') }}" class="list-group-item list-group-item-action {% if 'student' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('students.index') }}" class="list-group-item list-group-item-action {% if 'student' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-people-fill"></i> Students
                 </a>
-                <a href="{{ url_for('attendance') }}" class="list-group-item list-group-item-action {% if 'attendance' in request.endpoint %}active{% endif %}">
+                {% if current_user.is_instructor or current_user.has_permission('can_access_attendance') %}
+                <a href="{{ url_for('attendance.index') }}" class="list-group-item list-group-item-action restricted-menu {% if 'attendance' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-calendar-check"></i> Attendance
+                    {% if current_user.has_permission('can_access_attendance') and not current_user.is_instructor %}
+                        <span class="badge bg-warning float-end">Custom</span>
+                    {% endif %}
                 </a>
-                <a href="{{ url_for('assessments') }}" class="list-group-item list-group-item-action {% if 'assessment' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('assessments.index') }}" class="list-group-item list-group-item-action restricted-menu {% if 'assessment' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-journal-check"></i> Assessments
+                    {% if current_user.has_permission('can_access_assessments') and not current_user.is_instructor %}
+                        <span class="badge bg-warning float-end">Custom</span>
+                    {% endif %}
                 </a>
-                <a href="{{ url_for('certificates') }}" class="list-group-item list-group-item-action {% if 'certificate' in request.endpoint %}active{% endif %}">
+                {% endif %}
+                <a href="{{ url_for('certificates.index') }}" class="list-group-item list-group-item-action {% if 'certificate' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-award-fill"></i> Certificates
                 </a>
-                <a href="{{ url_for('payments') }}" class="list-group-item list-group-item-action {% if 'payment' in request.endpoint %}active{% endif %}">
+                {% if current_user.is_receptionist or current_user.has_permission('can_access_payments') %}
+                <a href="{{ url_for('payments.index') }}" class="list-group-item list-group-item-action restricted-menu {% if 'payment' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-cash-stack"></i> Payments
+                    {% if current_user.has_permission('can_access_payments') and not current_user.is_receptionist %}
+                        <span class="badge bg-warning float-end">Custom</span>
+                    {% endif %}
                 </a>
-                <a href="{{ url_for('sms') }}" class="list-group-item list-group-item-action {% if 'sms' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-chat-dots-fill"></i> SMS
+                {% endif %}
+                <a href="{{ url_for('messaging.index') }}" class="list-group-item list-group-item-action {% if 'messaging' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-chat-dots"></i> Messaging
                 </a>
-                <a href="{{ url_for('reports') }}" class="list-group-item list-group-item-action {% if 'report' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('reports.index') }}" class="list-group-item list-group-item-action {% if 'report' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-file-earmark-bar-graph"></i> Reports
                 </a>
+                {% if current_user.is_admin or current_user.has_permission('can_access_users') %}
+                <hr class="restricted-menu">
+                <a href="{{ url_for('users.index') }}" class="list-group-item list-group-item-action restricted-menu {% if 'user' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-people"></i> User Management
+                    {% if current_user.has_permission('can_access_users') and not current_user.is_admin %}
+                        <span class="badge bg-warning float-end">Custom</span>
+                    {% endif %}
+                </a>
+                {% endif %}
                 <hr>
-                <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">
+                <a href="{{ url_for('users.profile') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person-circle"></i> My Profile
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
+                
+                <!-- Permission Visibility Toggle -->
+                <div class="text-center py-2 px-2 border-top">
+                    <button class="btn btn-sm btn-outline-info w-100" id="togglePermissions" 
+                            title="Show/hide restricted menu items">
+                        <i class="bi bi-eye"></i> <span id="toggleText">Show All Menus</span>
+                    </button>
+                    <small class="text-muted d-block mt-1" style="font-size: 10px;">
+                        Toggle to view all menu items
+                    </small>
+                </div>
+                <div class="text-center py-3 px-2">
+                    <a href="https://github.com/1amLonewolf" target="_blank" class="text-white-50 text-decoration-none small">
+                        <i class="bi bi-github"></i> Built by @1amLonewolf
+                    </a>
+                </div>
             </div>
         </div>
+
+        <script>
+// Permission visibility toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('togglePermissions');
+    const toggleText = document.getElementById('toggleText');
+    const restrictedMenus = document.querySelectorAll('.restricted-menu');
+    
+    // Check if user has custom permissions
+    const hasCustomPerms = {{ 'true' if current_user.custom_permissions else 'false' }};
+    
+    toggleBtn.addEventListener('click', function() {
+        const isShowingAll = toggleText.textContent === 'Hide Extra Menus';
+        
+        restrictedMenus.forEach(function(menu) {
+            if (isShowingAll) {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+                menu.classList.add('bg-warning'); // Highlight extra menus
+            }
+        });
+        
+        toggleText.textContent = isShowingAll ? 'Show All Menus' : 'Hide Extra Menus';
+        toggleBtn.classList.toggle('btn-outline-info');
+        toggleBtn.classList.toggle('btn-warning');
+    });
+});
+        </script>
         
         <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100">

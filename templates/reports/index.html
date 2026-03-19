@@ -14,10 +14,10 @@
             </div>
             <div class="card-body">
                 <p class="text-muted">Generate a comprehensive report for a single student including attendance, assessments, and payment history.</p>
-                <form action="{{ url_for('student_report', id=0) }}" method="GET">
+                <form id="studentReportForm" method="GET">
                     <div class="mb-3">
                         <label class="form-label">Select Student</label>
-                        <select name="id" class="form-select" required>
+                        <select name="id" id="studentSelect" class="form-select" required>
                             <option value="">-- Select Student --</option>
                             {% for student in students %}
                                 <option value="{{ student.id }}">{{ student.name }} ({{ student.cohort }})</option>
@@ -28,7 +28,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-eye"></i> View Report
                         </button>
-                        <a href="{{ url_for('export_data', type='students') }}" class="btn btn-outline-success">
+                        <a href="{{ url_for('reports.export', type='students') }}" class="btn btn-outline-success">
                             <i class="bi bi-download"></i> Export All Students to Excel
                         </a>
                     </div>
@@ -45,7 +45,7 @@
             </div>
             <div class="card-body">
                 <p class="text-muted">View summary statistics for a specific cohort or all students.</p>
-                <form action="{{ url_for('cohort_report') }}" method="GET">
+                <form action="{{ url_for('reports.cohort') }}" method="GET">
                     <div class="mb-3">
                         <label class="form-label">Select Cohort</label>
                         <select name="cohort" class="form-select">
@@ -74,10 +74,10 @@
             <div class="card-body">
                 <p class="text-muted">Export attendance records for analysis or record keeping.</p>
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('export_data', type='attendance') }}" class="btn btn-outline-success">
+                    <a href="{{ url_for('reports.export', type='attendance') }}" class="btn btn-outline-success">
                         <i class="bi bi-download"></i> Export Attendance to Excel
                     </a>
-                    <a href="{{ url_for('attendance') }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('attendance.index') }}" class="btn btn-outline-primary">
                         <i class="bi bi-calendar"></i> Mark Attendance
                     </a>
                 </div>
@@ -94,10 +94,10 @@
             <div class="card-body">
                 <p class="text-muted">Export all assessment records and scores.</p>
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('export_data', type='assessments') }}" class="btn btn-outline-success">
+                    <a href="{{ url_for('reports.export', type='assessments') }}" class="btn btn-outline-success">
                         <i class="bi bi-download"></i> Export Assessments to Excel
                     </a>
-                    <a href="{{ url_for('assessments') }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('assessments.index') }}" class="btn btn-outline-primary">
                         <i class="bi bi-plus-circle"></i> Add Assessment
                     </a>
                 </div>
@@ -132,4 +132,14 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('studentReportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const studentId = document.getElementById('studentSelect').value;
+    if (studentId) {
+        window.location.href = `/reports/student/${studentId}`;
+    }
+});
+</script>
 {% endblock %}

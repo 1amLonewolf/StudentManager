@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Send Email - {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-envelope"></i> Send Email to {{ student.name }}</h5>
+            </div>
+            <div class="card-body">
+                <!-- Student Info -->
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Email:</strong> {{ student.email or 'Not provided' }}<br>
+                            <strong>Phone:</strong> {{ student.phone or 'Not provided' }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Cohort:</strong> {{ student.cohort }}<br>
+                            <strong>Attendance:</strong> {{ student.attendance_rate }}%
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Recipient Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ student.email }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email Type</label>
+                        <select name="type" class="form-select" required>
+                            <option value="">-- Select Email Type --</option>
+                            <option value="welcome">Welcome Email</option>
+                            <option value="attendance">Attendance Alert</option>
+                            <option value="report">Monthly Progress Report</option>
+                            <option value="custom">Custom Email (Coming Soon)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="emailPreview" class="mb-3" style="display: none;">
+                        <label class="form-label">Preview</label>
+                        <div class="alert alert-secondary">
+                            <strong id="previewSubject"></strong>
+                            <p id="previewBody" class="mb-0 mt-2"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Email
+                        </button>
+                        <a href="{{ url_for('messaging.index') }}" class="btn btn-secondary">Cancel</a>
+                        {% if student.phone %}
+                        <a href="{{ url_for('messaging.send_whatsapp', student_id=student.id) }}" 
+                           class="btn btn-success" target="_blank">
+                            <i class="bi bi-whatsapp"></i> WhatsApp Instead
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+                
+                <!-- Quick Templates -->
+                <hr class="my-4">
+                
+                <h6>Quick Message Templates:</h6>
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action" onclick="prefillWhatsApp('attendance')">
+                        <i class="bi bi-whatsapp"></i> Attendance Alert (WhatsApp)
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="prefillWhatsApp('payment')">
+                        <i class="bi bi-whatsapp"></i> Payment Reminder (WhatsApp)
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="prefillWhatsApp('encouragement')">
+                        <i class="bi bi-whatsapp"></i> Words of Encouragement (WhatsApp)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function prefillWhatsApp(type) {
+    const messages = {
+        'attendance': `Dear ${student.name}, your attendance is {{ student.attendance_rate }}%. Please attend regularly to complete your course.`,
+        'payment': `Dear ${student.name}, you have an outstanding balance. Please complete your payment to continue.`,
+        'encouragement': `Dear ${student.name}, keep up the good work! You're doing great in your studies.`
+    };
+    
+    const message = messages[type] || '';
+    const url = `/messaging/whatsapp/{{ student.id }}?message=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
+// Email type preview
+document.querySelector('select[name="type"]').addEventListener('change', function() {
+    const previews = {
+        'welcome': {
+            subject: 'Welcome to Computer Packages!',
+            body: 'A warm welcome email with course details and enrollment information.'
+        },
+        'attendance': {
+            subject: 'Attendance Alert',
+            body: 'Notification about low attendance rate with current statistics.'
+        },
+        'report': {
+            subject: 'Monthly Progress Report',
+            body: 'Comprehensive progress report including attendance, performance, and payment status.'
+        }
+    };
+    
+    const preview = previews[this.value];
+    if (preview) {
+        document.getElementById('previewSubject').textContent = preview.subject;
+        document.getElementById('previewBody').textContent = preview.body;
+        document.getElementById('emailPreview').style.display = 'block';
+    } else {
+        document.getElementById('emailPreview').style.display = 'none';
+    }
+});
+</script>
+
+<script>
+// Pass student name to JavaScript
+const student = { name: '{{ student.name }}', attendance_rate: '{{ student.attendance_rate }}' };
+</script>
+{% endblock %}

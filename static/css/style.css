@@ -9,12 +9,14 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
+    overflow-x: hidden;
 }
 
 /* Sidebar Styles */
 #wrapper {
     display: flex;
     width: 100%;
+    overflow-x: hidden;
 }
 
 #sidebar-wrapper {
@@ -60,12 +62,14 @@ body {
 }
 
 #page-content-wrapper {
-    min-width: 100vw;
+    flex: 1;
+    min-width: 0;
     margin-left: var(--sidebar-width);
     transition: margin 0.25s ease-out;
+    overflow-x: hidden;
 }
 
-/* Sidebar Toggled State */
+/* Sidebar Toggled State - hide sidebar */
 #wrapper.toggled #sidebar-wrapper {
     margin-left: calc(-1 * var(--sidebar-width));
 }
@@ -189,13 +193,22 @@ body {
     #sidebar-wrapper {
         margin-left: calc(-1 * var(--sidebar-width));
     }
-    
+
     #page-content-wrapper {
         margin-left: 0;
     }
-    
+
     #wrapper.toggled #sidebar-wrapper {
         margin-left: 0;
+    }
+    
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: 0;
+    }
+    
+    #wrapper,
+    #page-content-wrapper {
+        overflow-x: hidden;
     }
 }
 

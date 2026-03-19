@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #ffc107; color: #333; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .alert-box { background: #fff3cd; padding: 20px; margin: 15px 0; border-left: 4px solid #ffc107; }
+        .stats { background: white; padding: 15px; margin: 15px 0; }
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { display: inline-block; padding: 10px 20px; background: #1e3a5f; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ Attendance Alert</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear <strong>{{ student.name }}</strong>,</p>
+            
+            <div class="alert-box">
+                <p><strong>Important:</strong> Your current attendance rate is <strong>{{ student.attendance_rate }}%</strong>, which is below the required 70%.</p>
+            </div>
+            
+            <p>Regular attendance is crucial for successfully completing your course. Please make every effort to attend all remaining classes.</p>
+            
+            <div class="stats">
+                <h3>Your Current Statistics:</h3>
+                <div class="stat-row">
+                    <span>Attendance Rate:</span>
+                    <strong style="color: {{ 'red' if student.attendance_rate < 70 else 'green' }};">{{ student.attendance_rate }}%</strong>
+                </div>
+                <div class="stat-row">
+                    <span>Classes Attended:</span>
+                    <strong>{{ sum(1 for a in student.attendances if a.present) }}</strong>
+                </div>
+                <div class="stat-row">
+                    <span>Total Classes:</span>
+                    <strong>{{ student.attendances|length }}</strong>
+                </div>
+            </div>
+            
+            <p>If you have any challenges affecting your attendance, please contact the administration as soon as possible.</p>
+            
+            <p>Best regards,<br>
+            <strong>Course Administrator</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{ student.enrollment_date.year }} Student Manager. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
