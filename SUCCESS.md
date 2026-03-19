@@ -1,6 +1,6 @@
 # ✅ Installation Successful!
 
-## 🎉 Your Student Manager is Ready!
+## 🎉 Your COLMAC COMPUTER COLLEGE System is Ready!
 
 The application is now running at: **http://localhost:5000**
 

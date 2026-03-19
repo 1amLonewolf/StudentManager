@@ -1,4 +1,4 @@
-# Student Manager - Project Summary
+# COLMAC COMPUTER COLLEGE - Project Summary
 
 ## 🎯 What This Is
 

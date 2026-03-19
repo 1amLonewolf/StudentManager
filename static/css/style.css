@@ -21,6 +21,7 @@ body {
 
 #sidebar-wrapper {
     min-height: 100vh;
+    max-height: 100vh;
     width: var(--sidebar-width);
     margin-left: 0;
     background-color: var(--primary-color);
@@ -28,6 +29,8 @@ body {
     transition: margin 0.25s ease-out;
     position: fixed;
     z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #sidebar-wrapper .sidebar-heading {
@@ -236,6 +239,24 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+/* Sidebar Scrollbar Styling */
+#sidebar-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sidebar-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+#sidebar-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* Stats Display */

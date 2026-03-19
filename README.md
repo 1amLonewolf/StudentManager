@@ -1,4 +1,4 @@
-# Student Manager - Computer Packages Course
+# COLMAC COMPUTER COLLEGE - Computer Packages Course
 
 A simple, practical student management system designed for a computer college offering 2-month short courses in Microsoft Office Suite and Internet basics.
 
