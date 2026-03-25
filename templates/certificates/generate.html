@@ -6,9 +6,9 @@
 <h2 class="mb-4"><i class="bi bi-award-fill"></i> Generate Certificates</h2>
 
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> 
+    <i class="bi bi-info-circle"></i>
     Select students who have completed their course to generate certificates.
-    Students must have assessments recorded to be eligible.
+    Students must have: <strong>(1) Average score ≥ 50%</strong> AND <strong>(2) Paid fees in full</strong>.
 </div>
 
 <form method="POST">
@@ -27,6 +27,7 @@
                             <th>Cohort</th>
                             <th>Status</th>
                             <th>Avg Score</th>
+                            <th>Fees Paid</th>
                             <th>Modules Passed</th>
                         </tr>
                     </thead>
@@ -52,6 +53,15 @@
                                 <span class="{% if student.average_score >= 50 %}text-success{% else %}text-danger{% endif %}">
                                     <strong>{{ student.average_score }}%</strong>
                                 </span>
+                            </td>
+                            <td>
+                                {% set paid = student.total_paid %}
+                                {% set fee = 4000 %}
+                                {% if paid >= fee %}
+                                    <span class="text-success"><i class="bi bi-check-circle"></i> Paid (KES {{ paid }})</span>
+                                {% else %}
+                                    <span class="text-danger"><i class="bi bi-x-circle"></i> KES {{ paid }} / {{ fee }} (Balance: {{ fee - paid }})</span>
+                                {% endif %}
                             </td>
                             <td>
                                 {% set passed_modules = student.assessments|selectattr('passed')|list %}

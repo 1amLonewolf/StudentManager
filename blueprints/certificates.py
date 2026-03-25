@@ -51,10 +51,11 @@ def index():
 def generate():
     from app import generate_certificate_number
     from certificate_generator import generate_certificate
-    
+
     if request.method == 'POST':
         student_ids = request.form.getlist('student_ids')
         generated = []
+        not_eligible = []
 
         for student_id in student_ids:
             student = Student.query.get(int(student_id))
@@ -67,17 +68,28 @@ def generate():
                 flash(f'Certificate already exists for {student.name}', 'warning')
                 continue
 
+            # ENFORCE 50% MINIMUM REQUIREMENT
+            avg_score = student.average_score
+            if avg_score < 50:
+                not_eligible.append(f'{student.name} (Average: {avg_score:.1f}%)')
+                continue
+
+            # ENFORCE FULL PAYMENT REQUIREMENT
+            from flask import current_app
+            course_fee = current_app.config.get('COURSE_FEE', 4000)
+            if student.total_paid < course_fee:
+                balance = course_fee - student.total_paid
+                not_eligible.append(f'{student.name} (Balance: KES {balance:,})')
+                continue
+
             # Get modules completed (from assessments)
             modules_completed = [a.module for a in student.assessments if a.passed]
 
             # Determine grade
-            avg_score = student.average_score
             if avg_score >= 80:
                 grade = 'Distinction'
             elif avg_score >= 65:
                 grade = 'Credit'
-            elif avg_score >= 50:
-                grade = 'Pass'
             else:
                 grade = 'Pass'
 
@@ -106,7 +118,11 @@ def generate():
         db.session.commit()
 
         if generated:
-            flash(f'Certificates generated for: {", ".join(generated)}', 'success')
+            flash(f'✅ Certificates generated for: {", ".join(generated)}', 'success')
+        
+        if not_eligible:
+            flash(f'⚠️ Cannot generate certificates for students with < 50%: {", ".join(not_eligible)}', 'warning')
+        
         return redirect(url_for('.index'))
 
     # Get students eligible for certificates
@@ -119,12 +135,33 @@ def generate():
     student_ids_with_certs = [c[0] for c in students_with_certs]
     eligible_students = [s for s in eligible_students if s.id not in student_ids_with_certs]
 
+    # FILTER OUT students with average score < 50%
+    eligible_students = [s for s in eligible_students if s.average_score >= 50]
+
+    # FILTER OUT students who haven't paid in full
+    from flask import current_app
+    course_fee = current_app.config.get('COURSE_FEE', 4000)
+    eligible_students = [s for s in eligible_students if s.total_paid >= course_fee]
+
     return render_template('certificates/generate.html', students=eligible_students)
 
 @certificates_bp.route('/<int:id>/download')
 @login_required
 def download(id):
+    from flask import current_app
+    
     certificate = Certificate.query.get_or_404(id)
+    student = Student.query.get(certificate.student_id)
+    
+    # CHECK IF STUDENT HAS PAID IN FULL
+    course_fee = current_app.config.get('COURSE_FEE', 4000)
+    total_paid = student.total_paid
+    
+    if total_paid < course_fee:
+        balance = course_fee - total_paid
+        flash(f'⚠️ Cannot download certificate. Outstanding balance: KES {balance:,} (Paid: KES {total_paid:,} / {course_fee:,})', 'warning')
+        return redirect(url_for('payments.index'))
+    
     import os
     if certificate.pdf_path and os.path.exists(certificate.pdf_path):
         return send_file(certificate.pdf_path, as_attachment=True)

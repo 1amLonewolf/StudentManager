@@ -20,6 +20,7 @@
                         <th>Student</th>
                         <th>Course</th>
                         <th>Grade</th>
+                        <th>Fees Status</th>
                         <th>Issue Date</th>
                         <th>Actions</th>
                     </tr>
@@ -43,13 +44,22 @@
                                 <span class="badge bg-secondary">{{ cert.grade }}</span>
                             {% endif %}
                         </td>
+                        <td>
+                            {% set paid = cert.student.total_paid %}
+                            {% set fee = 4000 %}
+                            {% if paid >= fee %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-danger">Balance: KES {{ fee - paid }}</span>
+                            {% endif %}
+                        </td>
                         <td>{{ cert.issue_date.strftime('%d/%m/%Y') }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('certificates.download', id=cert.id) }}" class="btn btn-outline-primary" title="Download">
                                     <i class="bi bi-download"></i>
                                 </a>
-                                <a href="{{ url_for('certificates.print', id=cert.id) }}" class="btn btn-outline-success" title="Print" target="_blank">
+                                <a href="{{ url_for('certificates.download', id=cert.id) }}" class="btn btn-outline-success" title="Print" target="_blank">
                                     <i class="bi bi-printer"></i>
                                 </a>
                             </div>
