@@ -6,8 +6,36 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required
 from models import db, Student, Certificate, Assessment
 from datetime import datetime
+import io
 
 certificates_bp = Blueprint('certificates', __name__, url_prefix='/certificates')
+
+@certificates_bp.route('/test-preview')
+@login_required
+def test_preview():
+    """
+    Test endpoint to preview certificate text positions
+    Shows a sample certificate with position markers
+    """
+    from certificate_generator import generate_certificate
+    
+    # Get first student for testing
+    student = Student.query.first()
+    if not student:
+        flash('No students found. Add a student first.', 'warning')
+        return redirect(url_for('students.add'))
+    
+    # Generate test certificate
+    modules_completed = ['Ms Word', 'Ms Excel', 'Ms PowerPoint']
+    cert_number = 'TEST-001'
+    grade = 'Distinction'
+    
+    try:
+        output_path = generate_certificate(student, cert_number, modules_completed, grade)
+        return send_file(output_path, as_attachment=True)
+    except Exception as e:
+        flash(f'Error generating certificate: {str(e)}', 'danger')
+        return redirect(url_for('certificates.generate'))
 
 @certificates_bp.route('')
 @login_required
