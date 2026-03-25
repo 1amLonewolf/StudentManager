@@ -8,9 +8,9 @@ services:
     startCommand: "gunicorn wsgi:app --bind 0.0.0.0:$PORT"
     envVars:
       - key: SECRET_KEY
-        generateValue: true
+        value: "0581d72998b3e8ff6e47b920ea13a53c6c3ed5b9905807ccb2d8890cfd58dd8c"
       - key: DATABASE_URL
-        generateValue: true
+        value: "sqlite:////app/instance/studentmanager.db"
       - key: FLASK_ENV
         value: production
       - key: MAIL_SERVER
@@ -19,6 +19,12 @@ services:
         value: 587
       - key: MAIL_USE_TLS
         value: true
+      - key: MAIL_USERNAME
+        value: iamlonewolf023@gmail.com
+      - key: MAIL_PASSWORD
+        value: "@$Cam12345"
+      - key: MAIL_DEFAULT_SENDER
+        value: iamlonewolf023@gmail.com
       - key: COURSE_FEE
         value: 4000
       - key: COURSE_NAME

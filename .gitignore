@@ -24,8 +24,12 @@ wheels/
 *.egg
 
 # Flask
-instance/
+# Don't ignore instance folder (needed for Render deployment)
+# instance/
 .webassets-cache
+
+# Database (ignore all .db files in instance folder)
+instance/*.db
 
 # Environment
 .env

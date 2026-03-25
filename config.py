@@ -1,11 +1,23 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-change-in-production'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///studentmanager.db'
+    
+    # Database configuration
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    if DATABASE_URL:
+        # Use the provided DATABASE_URL (for PostgreSQL or custom SQLite path)
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        # Use SQLite in instance folder with absolute path
+        instance_path = Path(__file__).parent / 'instance'
+        instance_path.mkdir(exist_ok=True)
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{instance_path}/studentmanager.db'
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Application settings
