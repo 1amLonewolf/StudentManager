@@ -51,7 +51,7 @@ def generate_certificate(student, certificate_number, modules_completed, grade, 
         c.drawImage(template_path, 0, 0, width=width, height=height)
         
         # Add student name on the blank line under "This is to certify that"
-        c.setFont("Helvetica-Bold", 22)  # Increased from 18 to 22
+        c.setFont("Helvetica-Bold", 35)
         c.setFillColor(colors.black)
         c.drawCentredString(width / 2, height * 0.62, student.name)
         
@@ -60,22 +60,22 @@ def generate_certificate(student, certificate_number, modules_completed, grade, 
         c.setFillColor(colors.black)
         start_date = student.enrollment_date.strftime("%d %B %Y") if student.enrollment_date else "_______________"
         completion_date = datetime.now().strftime("%d %B %Y")
-        c.drawString(width * 0.15, height * 0.56, start_date)
-        c.drawString(width * 0.42, height * 0.56, completion_date)  # Moved right from 0.35 to 0.42
+        c.drawString(width * 0.17, height * 0.56, start_date)
+        c.drawString(width * 0.42, height * 0.56, completion_date)
         
         # Add modules list (already printed on template, this is for reference)
         # Modules are pre-printed on the template
         
-        # Add issue date on the "on this day of" line (below "Certificate in Computer Operations")
+        # Add issue date on the "on this day of" line (to the right of that text)
         c.setFont("Helvetica", 11)
         c.setFillColor(colors.black)
         issue_date = datetime.now().strftime("%d %B %Y")
-        c.drawString(width * 0.32, height * 0.25, issue_date)  # Lowered from 0.29 to 0.25
+        c.drawString(width * 0.52, height * 0.21, issue_date)  # Moved right to be after "on this day of"
         
-        # Add overall grade next to "Overall Grade:"
+        # Add overall grade beside "Overall Grade:" label
         c.setFont("Helvetica-Bold", 14)
         c.setFillColor(colors.darkblue)
-        c.drawString(width * 0.23, height * 0.16, grade)  # Lowered from 0.19 to 0.16, moved right from 0.20 to 0.23
+        c.drawString(width * 0.29, height * 0.15, grade)  # Moved right from 0.25 to 0.28 to be beside the label
         
         # Add signature lines (for manual signing - Trainer and Director)
         # Signatures are pre-printed on template
@@ -83,7 +83,7 @@ def generate_certificate(student, certificate_number, modules_completed, grade, 
         # Add certificate number at bottom (optional, can be removed if not needed)
         c.setFont("Helvetica", 8)
         c.setFillColor(colors.grey)
-        c.drawCentredString(width / 2, height * 0.05, f"Certificate No: {certificate_number}")
+        c.drawCentredString(width / 2, height * 0.01, f"Certificate No: {certificate_number}")
         
     else:
         # Create a simple certificate design (fallback)
