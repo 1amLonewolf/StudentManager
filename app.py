@@ -4,6 +4,11 @@ from flask_mail import Mail
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import os
+import logging
+
+# Configure logging for Render
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from config import Config
 from models import db, login_manager, migrate, User, Student, Course, Attendance, Assessment, Certificate, Payment, SMSLog, init_login_manager
@@ -11,6 +16,10 @@ from blueprints import auth_bp, main_bp, students_bp, attendance_bp, assessments
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Log configuration for debugging
+logger.info(f"DATABASE_URI: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
+logger.info(f"SECRET_KEY set: {bool(app.config.get('SECRET_KEY'))}")
 
 # Initialize extensions
 db.init_app(app)
@@ -41,6 +50,27 @@ def inject_config():
     return {
         'COURSE_FEE': app.config['COURSE_FEE'],
         'COURSE_NAME': app.config['COURSE_NAME']
+    }
+
+# ============== Health Check ==============
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for debugging"""
+    try:
+        # Test database connection
+        User.query.count()
+        db_status = "OK"
+    except Exception as e:
+        db_status = f"ERROR: {str(e)}"
+    
+    return {
+        "status": "healthy" if db_status == "OK" else "unhealthy",
+        "database": db_status,
+        "config": {
+            "DATABASE_URI": app.config.get('SQLALCHEMY_DATABASE_URI'),
+            "SECRET_KEY_set": bool(app.config.get('SECRET_KEY')),
+        }
     }
 
 # ============== Helper Functions ==============
