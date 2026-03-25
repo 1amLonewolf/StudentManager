@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: student-manager
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: COURSE_FEE
+        value: 4000
+      - key: COURSE_NAME
+        value: Computer Packages
+      - key: COURSE_DURATION_MONTHS
+        value: 2
+      - key: WHATSAPP_ENABLED
+        value: true
+      - key: WHATSAPP_COUNTRY_CODE
+        value: 254
+      - key: CERTIFICATE_TEMPLATE_PATH
+        value: static/certificates/template.png
+      - key: OUTPUT_CERTIFICATE_PATH
+        value: static/certificates/generated
+      - key: COLLEGE_LOGO_PATH
+        value: static/colmac_logo.png
+      - key: STUDENTS_PER_PAGE
+        value: 10

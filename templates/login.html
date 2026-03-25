@@ -4,22 +4,29 @@
 
 {% block extra_css %}
 <style>
+    .login-container {
+        text-align: center;
+    }
     .login-logo {
         width: 80px;
         height: 80px;
-        margin-bottom: 10px;
-    }
-    .login-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
     .login-header h3 {
         margin: 0;
-        white-space: nowrap;
         color: #1e3a5f;
+        text-align: center;
+        white-space: nowrap;
+        font-size: 1.1rem;
+    }
+    .login-subtitle {
+        text-align: center;
+    }
+    .login-form {
+        text-align: left;
     }
 </style>
 {% endblock %}
@@ -28,16 +35,16 @@
 <div class="row justify-content-center">
     <div class="col-md-4">
         <div class="card shadow">
-            <div class="card-body p-5">
+            <div class="card-body p-5 login-container">
+                <img src="{{ url_for('static', filename='colmac_logo.png') }}" alt="Colmac Logo" class="login-logo">
                 <div class="login-header">
-                    <img src="{{ url_for('static', filename='colmac_logo.png') }}" alt="Colmac Logo" class="login-logo">
                     <h3>COLMAC COMPUTER COLLEGE</h3>
                 </div>
-                <h5 class="text-center text-muted mb-4">Computer Packages Course</h5>
-                
-                <form method="POST">
+                <h5 class="login-subtitle text-muted mb-4">Computer Packages Course</h5>
+
+                <form method="POST" class="login-form">
                     {{ form.hidden_tag() }}
-                    
+
                     <div class="mb-3">
                         {{ form.username.label(class="form-label") }}
                         {{ form.username(class="form-control", placeholder="Enter username") }}
@@ -45,7 +52,7 @@
                             <span class="text-danger small">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    
+
                     <div class="mb-3">
                         {{ form.password.label(class="form-label") }}
                         {{ form.password(class="form-control", placeholder="Enter password") }}
@@ -53,12 +60,12 @@
                             <span class="text-danger small">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    
+
                     <div class="d-grid">
                         {{ form.submit(class="btn btn-primary btn-lg") }}
                     </div>
                 </form>
-                
+
                 <div class="mt-4 text-center">
                     <small class="text-muted">
                         Default: admin / admin123<br>
