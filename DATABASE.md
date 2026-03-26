@@ -159,18 +159,6 @@ Generated certificates.
 | pdf_path | VARCHAR(255) | Path to PDF file |
 | created_at | DATETIME | Record creation |
 
-### SMSLog
-Sent SMS message logs.
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| recipient | VARCHAR(20) | Phone number |
-| message | TEXT | SMS content |
-| status | VARCHAR(20) | pending/sent/failed |
-| sent_at | DATETIME | When sent |
-| error_message | TEXT | Error if failed |
-
 ### student_courses (Junction Table)
 Many-to-many relationship between students and courses.
 

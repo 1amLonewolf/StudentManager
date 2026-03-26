@@ -1,6 +1,6 @@
-# COLMAC COMPUTER COLLEGE - Computer Packages Course
+# COLMAC COMPUTER COLLEGE - Student Management System
 
-A simple, practical student management system designed for a computer college offering 2-month short courses in Microsoft Office Suite and Internet basics.
+A comprehensive student management system designed for COLMAC Computer College offering 2-month short courses in Microsoft Office Suite and Internet basics.
 
 ## Features
 
@@ -9,7 +9,8 @@ A simple, practical student management system designed for a computer college of
 - **Assessments**: Record and track scores for each module
 - **Certificates**: Generate completion certificates with student names and grades
 - **Payment Tracking**: Track course fee payments and balances
-- **SMS Notifications**: Send bulk SMS to students (Twilio integration)
+- **Email Notifications**: Send emails via Gmail (browser) or default Email App
+- **WhatsApp Integration**: Click-to-chat WhatsApp messaging (free)
 - **Reports & Analytics**: Dashboard with stats, student reports, cohort analysis
 - **Export**: Export data to Excel for external analysis
 
@@ -19,7 +20,8 @@ A simple, practical student management system designed for a computer college of
 - **Database**: SQLite (development) → PostgreSQL (production)
 - **Frontend**: HTML5 + Bootstrap 5 + Chart.js
 - **PDF Generation**: ReportLab
-- **SMS**: Twilio (optional)
+- **Email**: Gmail web integration + mailto: links (no configuration needed)
+- **WhatsApp**: Click-to-Chat (free, no API required)
 
 ## Quick Start
 
@@ -39,7 +41,7 @@ cp .env.example .env
 
 Edit `.env`:
 - Set `SECRET_KEY` to a random string
-- Configure Twilio credentials (optional, for SMS)
+- Configure Gmail credentials (optional - only needed for server-side email)
 
 ### 3. Initialize Database and Run
 
@@ -48,196 +50,214 @@ python app.py
 ```
 
 The app will:
-- Create the SQLite database automatically
-- Create default admin user (username: `admin`, password: `admin123`)
-- Create default "Computer Packages" course
+- Create the database automatically
+- Set up default admin account
+- Start the web server
 
-### 4. Access the Application
+Access at: `http://localhost:5000`
 
-Open your browser and go to: **http://localhost:5000**
+## Default Login
 
-Login with:
-- **Username**: admin
-- **Password**: admin123
+**Important**: Change the default password after first login!
 
-**⚠️ Change the default password after first login!**
+Check your `.env` file for default credentials or contact the administrator.
+
+## Key Features
+
+### Certificate Requirements
+
+Students must meet ALL three requirements to be eligible for certificate generation:
+
+1. ✅ **Attendance ≥ 50%** - Must attend at least half of all classes
+2. ✅ **Average Score ≥ 50%** - Must pass module assessments
+3. ✅ **Full Payment** - Must pay complete course fee (KES 4,000)
+
+### Email Notifications
+
+Two options available (no server configuration needed):
+
+1. **Send via Gmail** - Opens Gmail compose in browser with pre-filled details
+2. **Open Email App** - Opens your default email client (Outlook, Mail, etc.)
+
+Features:
+- Individual student emails
+- Bulk attendance alerts
+- Pre-filled messages
+- No SMTP configuration required
+
+### WhatsApp Messaging
+
+Free click-to-chat integration:
+- No API required
+- Uses your phone's WhatsApp
+- Pre-filled messages
+- Send to individual students
 
 ## Project Structure
 
 ```
 StudentManager/
-├── app.py                  # Main Flask application
-├── config.py               # Configuration settings
-├── models.py               # Database models
-├── forms.py                # WTForms forms
-├── certificate_generator.py # PDF certificate generation
-├── sms_service.py          # SMS sending service
-├── reports.py              # Report generation
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (create from .env.example)
-├── static/
-│   ├── css/style.css       # Custom styles
-│   ├── js/main.js          # JavaScript utilities
-│   └── certificates/       # Certificate templates and generated PDFs
-└── templates/
-    ├── base.html           # Base template
-    ├── login.html          # Login page
-    ├── dashboard.html      # Dashboard
-    ├── students/           # Student management pages
-    ├── attendance/         # Attendance pages
-    ├── assessments/        # Assessment pages
-    ├── certificates/       # Certificate pages
-    ├── payments/           # Payment pages
-    ├── sms/                # SMS pages
-    └── reports/            # Report pages
+├── app.py                      # Main Flask application
+├── config.py                   # Configuration management
+├── models.py                   # Database models
+├── forms.py                    # WTForms form classes
+├── decorators.py               # Role-based access decorators
+├── certificate_generator.py    # PDF certificate generation
+├── email_service.py            # Email service (optional)
+├── reports.py                  # Report generation & Excel export
+├── commands.py                 # Flask CLI commands
+├── requirements.txt            # Python dependencies
+├── .env.example                # Environment variable template
+│
+├── blueprints/                 # Modular route organization
+│   ├── __init__.py             # Blueprint registry
+│   ├── auth.py                 # Login/logout routes
+│   ├── main.py                 # Dashboard routes
+│   ├── students.py             # Student CRUD routes
+│   ├── attendance.py           # Attendance tracking routes
+│   ├── assessments.py          # Assessment routes
+│   ├── certificates.py         # Certificate generation routes
+│   ├── payments.py             # Payment tracking routes
+│   ├── messaging.py            # Email/WhatsApp routes
+│   ├── users.py                # User management routes
+│   └── reports.py              # Reports & export routes
+│
+├── templates/                  # HTML templates
+│   ├── base.html               # Base template with sidebar
+│   ├── login.html              # Login page
+│   ├── dashboard.html          # Main dashboard
+│   ├── students/               # Student management templates
+│   ├── attendance/             # Attendance templates
+│   ├── assessments/            # Assessment templates
+│   ├── certificates/           # Certificate templates
+│   ├── payments/               # Payment templates
+│   ├── messaging/              # Messaging templates
+│   ├── reports/                # Report templates
+│   └── users/                  # User management templates
+│
+├── static/                     # Static assets
+│   ├── css/style.css           # Custom styles
+│   ├── js/main.js              # JavaScript utilities
+│   ├── certificates/           # Certificate templates & generated PDFs
+│   └── colmac_logo.png         # College logo
+│
+└── Documentation
+    ├── README.md               # This file
+    ├── HOW_TO_RUN.md           # Quick start guide
+    ├── DATABASE.md             # Database schema documentation
+    ├── DEPLOYMENT.md           # Deployment instructions
+    ├── MESSAGING_SETUP.md      # Email/WhatsApp setup
+    ├── USER_MANAGEMENT.md      # Role-based access guide
+    └── PRODUCTION_CHECKLIST.md # Production deployment checklist
 ```
 
-## Usage Guide
+## User Roles
 
-### Adding a Student
+### Admin
+- Full system access
+- User management
+- All permissions
 
-1. Go to **Students** → **Add Student**
-2. Fill in student details
-3. Select cohort (e.g., "Jan-Mar 2026")
-4. Save
+### Instructor
+- Mark attendance
+- Record assessments
+- View student progress
+- Generate certificates
 
-### Marking Attendance
+### Receptionist
+- Register students
+- Track payments
+- Manage student records
 
-1. Go to **Attendance**
-2. Select date and module (Word, Excel, etc.)
-3. Check present/absent for each student
-4. Add notes if needed
-5. Save
+## Certificate Generation
 
-### Recording Assessments
+Certificates are automatically generated with:
+- Student name
+- Training period (from/to dates)
+- Course name (Computer Packages)
+- Modules completed
+- Overall grade (Pass/Credit/Distinction)
+- Issue date
+- Certificate number
 
-1. Go to **Assessments** → Select a student
-2. Click **Add Assessment**
-3. Select module, enter score
-4. Add remarks (optional)
-5. Save
+### Grading System
 
-### Generating Certificates
+- **Distinction**: 80% and above
+- **Credit**: 65% - 79%
+- **Pass**: 50% - 64%
 
-1. Ensure student has assessments recorded
-2. Go to **Certificates** → **Generate Certificates**
-3. Select eligible students
-4. Click **Generate Selected Certificates**
-5. Download or print certificates
+## Database
 
-### Custom Certificate Template
+### Main Tables
 
-To use your college's certificate design:
-
-1. Save your certificate as a PNG image (A4 landscape, 300 DPI recommended)
-2. Place it at: `static/certificates/template.png`
-3. The system will overlay student names automatically
-
-### Sending SMS
-
-**Development Mode** (no Twilio configured):
-- Messages are logged but not sent
-- Useful for testing
-
-**Production Mode** (with Twilio):
-1. Set Twilio credentials in `.env`
-2. Go to **SMS** → **Send SMS**
-3. Select recipients
-4. Compose message
-5. Send
-
-### Exporting Data
-
-1. Go to **Reports**
-2. Choose export type (Students, Attendance, Assessments, Payments)
-3. Download Excel file
+- **User**: System users (admin, instructors, receptionists)
+- **Student**: Student records
+- **Course**: Available courses
+- **Attendance**: Daily attendance per module
+- **Assessment**: Module scores
+- **Certificate**: Generated certificates
+- **Payment**: Fee payments
 
 ## Deployment
 
-### Local Network (Recommended for Single Computer)
+### Local Development
 
 ```bash
 python app.py
 ```
 
-Access from other computers on the same network:
-- Find your IP: `ipconfig` (Windows) or `ifconfig` (Linux/Mac)
-- Access: `http://YOUR_IP:5000`
+Access at: `http://localhost:5000`
 
-### Online Deployment (Free Options)
+### Production (Render)
 
-**Option 1: PythonAnywhere (Free)**
-1. Create account at pythonanywhere.com
-2. Upload project files
-3. Configure virtual environment
-4. Set up web app
+1. Push code to GitHub
+2. Deploy on Render.com
+3. Set environment variables
+4. PostgreSQL database auto-created
 
-**Option 2: Render (Free)**
-1. Create account at render.com
-2. Connect GitHub repository
-3. Deploy as Web Service
+See `DEPLOYMENT.md` for detailed instructions.
 
-**Option 3: Railway (Free)**
-1. Create account at railway.app
-2. Deploy from GitHub
-3. Configure environment variables
+## Environment Variables
 
-## Database Backup
+Required variables in `.env`:
 
-SQLite database is stored at: `instance/studentmanager.db`
-
-**Backup**: Copy this file to a safe location regularly.
-
-**Restore**: Replace the database file with your backup.
-
-## Troubleshooting
-
-**Port already in use:**
 ```bash
-# Change port in app.py
-app.run(debug=True, host='0.0.0.0', port=5001)
+# Flask Configuration
+FLASK_APP=app.py
+FLASK_ENV=production
+SECRET_KEY=your-secret-key-here
+
+# Database
+DATABASE_URL=sqlite:///studentmanager.db  # Local
+# DATABASE_URL=postgresql://...           # Production
+
+# Email (Optional - only for server-side sending)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+
+# Application Settings
+COURSE_FEE=4000
+COURSE_NAME=Computer Packages
+COURSE_DURATION_MONTHS=2
+
+# WhatsApp
+WHATSAPP_ENABLED=true
+WHATSAPP_COUNTRY_CODE=254
 ```
-
-**Database errors:**
-```bash
-# Delete and recreate database
-rm instance/studentmanager.db
-python app.py
-```
-
-**Module not found:**
-```bash
-pip install -r requirements.txt --upgrade
-```
-
-## Security Notes
-
-- Change default admin password immediately
-- Use strong SECRET_KEY in production
-- Enable HTTPS for online deployments
-- Regular database backups
-- Keep dependencies updated
-
-## Future Enhancements
-
-- Student login portal (view own progress)
-- Email notifications
-- QR code attendance
-- Advanced analytics
-- Multi-course support
-- Staff management
-- Library integration
-
-## License
-
-This project is created as a passion project for educational purposes. Feel free to modify and use as needed.
 
 ## Support
 
-For issues or questions, check the Flask documentation:
-- Flask: https://flask.palletsprojects.com/
-- Bootstrap: https://getbootstrap.com/docs/5.3/
+For issues or questions:
+- Check documentation files in the project root
+- Review `HOW_TO_RUN.md` for setup help
+- Check `DEPLOYMENT.md` for deployment issues
 
----
+## License
 
-**Built with ❤️ for Computer Packages Course**
+Proprietary - COLMAC Computer College
+
+## Credits
+
+Built by [@1amLonewolf](https://github.com/1amLonewolf)

@@ -15,25 +15,39 @@ payments_bp = Blueprint('payments', __name__, url_prefix='/payments', template_f
 @receptionist_required
 def index():
     from app import app
-    
+
     page = request.args.get('page', 1, type=int)
     payments = Payment.query.order_by(Payment.payment_date.desc()).paginate(
         page=page, per_page=10, error_out=False
     )
 
+    # Get all students with payment status
+    COURSE_FEE = app.config['COURSE_FEE']
+    students = Student.query.order_by(Student.name).all()
+    
+    # Calculate payment status for each student
+    student_payment_status = []
+    for student in students:
+        total_paid = student.total_paid
+        balance = COURSE_FEE - total_paid
+        student_payment_status.append({
+            'student': student,
+            'total_paid': total_paid,
+            'balance': balance,
+            'course_fee': COURSE_FEE,
+            'percentage_paid': round((total_paid / COURSE_FEE) * 100, 1) if total_paid > 0 else 0
+        })
+
     # Calculate stats
     total_revenue = db.session.query(func.sum(Payment.amount)).scalar() or 0
-    COURSE_FEE = app.config['COURSE_FEE']
-    pending_fees = 0
-    for student in Student.query.filter_by(status='active').all():
-        pending = COURSE_FEE - student.total_paid
-        if pending > 0:
-            pending_fees += pending
+    pending_fees = sum(s['balance'] for s in student_payment_status if s['balance'] > 0)
 
     return render_template('payments/index.html',
                          payments=payments,
+                         student_payment_status=student_payment_status,
                          total_revenue=total_revenue,
-                         pending_fees=pending_fees)
+                         pending_fees=pending_fees,
+                         course_fee=COURSE_FEE)
 
 @payments_bp.route('/students/<int:id>', methods=['GET', 'POST'])
 @login_required

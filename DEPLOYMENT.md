@@ -1,6 +1,8 @@
 # Deployment Guide
 
-## Local Development (Already Working!)
+## Local Development
+
+### Quick Start
 
 ```bash
 # Install dependencies
@@ -10,189 +12,343 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Access at: http://localhost:5000
+Access at: `http://localhost:5000`
 
 ---
 
-## Deploy to PythonAnywhere (Free)
+## Production Deployment Options
 
-### Step 1: Create Account
-1. Go to https://www.pythonanywhere.com
-2. Sign up for free account
+### Option 1: Render (Recommended)
 
-### Step 2: Upload Files
-1. Go to **Files** tab
-2. Create directory: `StudentManager`
-3. Upload all project files
+**Pros:**
+- Free tier available
+- Auto-deploy from GitHub
+- PostgreSQL included
+- HTTPS automatic
+- Easy setup
 
-### Step 3: Create Virtual Environment
-1. Go to **Consoles** tab
-2. Start Bash console
-3. Run:
-```bash
-cd StudentManager
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+**Cons:**
+- Free tier sleeps after 15 min inactivity
 
-### Step 4: Configure Web App
-1. Go to **Web** tab
-2. Click **Add a new web app**
-3. Select **Manual configuration**
-4. Python 3.10 (or latest)
-5. Set source code directory to: `/home/yourusername/StudentManager`
-6. Set virtualenv to: `/home/yourusername/StudentManager/venv`
+#### Deploy Steps
 
-### Step 5: Configure WSGI
-Edit WSGI configuration file:
-```python
-import sys
-path = '/home/yourusername/StudentManager'
-if path not in sys.path:
-    sys.path.append(path)
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Production ready"
+   git push origin master
+   ```
 
-from app import app as application
-```
+2. **Create Render Account**
+   - Go to https://render.com
+   - Sign up with GitHub
 
-### Step 6: Set Environment Variables
-In **Web** → **WSGI configuration file**:
-```python
-import os
-os.environ['SECRET_KEY'] = 'your-secret-key'
-os.environ['DATABASE_URL'] = 'sqlite:///studentmanager.db'
-```
+3. **Create Web Service**
+   - Click **New +** → **Web Service**
+   - Connect your GitHub repository
+   - Select `StudentManager`
 
-### Step 7: Reload
-Click **Reload** button on Web tab
+4. **Configure Settings**
+   - **Name:** `studentmanager`
+   - **Region:** Oregon (closest to Kenya)
+   - **Branch:** `master`
+   - **Runtime:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn wsgi:app --bind 0.0.0.0:$PORT`
 
-**Your app is now live at:** `yourusername.pythonanywhere.com`
+5. **Add Environment Variables**
+   - `SECRET_KEY`: Your secret key
+   - `FLASK_ENV`: `production`
+   - Other settings from `.env.example`
+
+6. **Deploy**
+   - Click **Create Web Service**
+   - Wait 5-10 minutes for deployment
+
+**URL:** `https://studentmanager-xxxx.onrender.com`
 
 ---
 
-## Deploy to Render (Free)
+### Option 2: PythonAnywhere
 
-### Step 1: Prepare for Render
+**Pros:**
+- Free tier (always on)
+- Easy setup
+- Includes database
 
-Create `render.yaml`:
-```yaml
-services:
-  - type: web
-    name: student-manager
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
-    envVars:
-      - key: SECRET_KEY
-        generateValue: true
-      - key: DATABASE_URL
-        generateValue: true
-```
+**Cons:**
+- Limited resources
+- Manual deployment
 
-### Step 2: Push to GitHub
-1. Create GitHub repository
-2. Push your code
+#### Deploy Steps
 
-### Step 3: Deploy on Render
-1. Go to https://render.com
-2. Sign up/Login
-3. **New +** → **Web Service**
-4. Connect GitHub repository
-5. Configure:
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-6. Add environment variables
-7. Deploy
+1. **Create Account**
+   - Go to https://pythonanywhere.com
+   - Sign up for free account
 
-**Your app is now live at:** `student-manager.onrender.com`
+2. **Upload Files**
+   - Go to **Files** tab
+   - Create directory: `StudentManager`
+   - Upload all project files
 
----
+3. **Create Virtual Environment**
+   - Go to **Consoles** tab
+   - Start Bash console
+   - Run:
+     ```bash
+     cd StudentManager
+     python3 -m venv venv
+     source venv/bin/activate
+     pip install -r requirements.txt
+     ```
 
-## Deploy to Railway (Free)
+4. **Configure Web App**
+   - Go to **Web** tab
+   - Click **Add a new web app**
+   - Select **Manual configuration**
+   - Python 3.10
+   - Set paths
 
-### Step 1: Create Railway Account
-Go to https://railway.app
+5. **Configure WSGI**
+   Edit WSGI file:
+   ```python
+   import sys
+   path = '/home/yourusername/StudentManager'
+   if path not in sys.path:
+       sys.path.append(path)
+   
+   from app import app as application
+   ```
 
-### Step 2: Deploy from GitHub
-1. Click **New Project**
-2. Select **Deploy from GitHub**
-3. Choose your repository
+6. **Set Environment Variables**
+   In web tab, add:
+   - `SECRET_KEY`
+   - `DATABASE_URL`
+   - Other settings
 
-### Step 3: Configure
-Railway auto-detects Python apps. Just set environment variables:
-- `SECRET_KEY`
-- `DATABASE_URL`
+7. **Reload**
+   - Click **Reload** button
 
-### Step 4: Deploy
-Click **Deploy**
-
-**Your app is now live!**
-
----
-
-## Production Checklist
-
-- [ ] Change default admin password
-- [ ] Set strong `SECRET_KEY`
-- [ ] Configure database (PostgreSQL recommended)
-- [ ] Enable HTTPS (automatic on most platforms)
-- [ ] Set up regular database backups
-- [ ] Configure Twilio for SMS (optional)
-- [ ] Add certificate template
-- [ ] Test all features
-- [ ] Document admin credentials securely
+**URL:** `yourusername.pythonanywhere.com`
 
 ---
 
-## Database Migration (SQLite → PostgreSQL)
+### Option 3: Railway
+
+**Pros:**
+- Easy deployment
+- Generous free tier
+- Auto-detects Python
+
+**Cons:**
+- Requires credit card for verification
+
+#### Deploy Steps
+
+1. **Push to GitHub** (see Render steps)
+
+2. **Create Railway Account**
+   - Go to https://railway.app
+   - Sign up with GitHub
+
+3. **Deploy**
+   - Click **New Project**
+   - Select **Deploy from GitHub**
+   - Choose repository
+
+4. **Configure**
+   - Railway auto-detects Python
+   - Set environment variables
+   - Deploy
+
+**URL:** `studentmanager.up.railway.app`
+
+---
+
+### Option 4: Local Network (No Internet)
+
+**Pros:**
+- Free
+- Full control
+- No internet required
+
+**Cons:**
+- Only accessible on your network
+- Computer must stay on
+
+#### Setup Steps
+
+1. **Run the app**
+   ```bash
+   python app.py
+   ```
+
+2. **Find your IP address**
+   - Windows: `ipconfig`
+   - Look for IPv4 Address (e.g., 192.168.1.100)
+
+3. **Access from other devices**
+   ```
+   http://YOUR_IP:5000
+   ```
+
+4. **Keep running 24/7**
+   - Don't shut down computer
+   - Use `launch.vbs` for auto-start on Windows boot
+
+---
+
+## Database Migration
+
+### SQLite → PostgreSQL
 
 For production deployment:
 
-### 1. Install PostgreSQL adapter
+1. **Install PostgreSQL adapter**
+   ```bash
+   pip install psycopg2-binary
+   ```
+
+2. **Update `.env`**
+   ```
+   DATABASE_URL=postgresql://user:password@host:5432/dbname
+   ```
+
+3. **Run migrations**
+   ```bash
+   flask db upgrade
+   ```
+
+---
+
+## Environment Variables
+
+### Required for Production
+
 ```bash
-pip install psycopg2-binary
+# Flask
+FLASK_APP=app.py
+FLASK_ENV=production
+SECRET_KEY=<generate-strong-key>
+
+# Database (Render auto-configures)
+DATABASE_URL=<auto-provided-by-render>
+
+# Email (Optional)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+
+# Application
+COURSE_FEE=4000
+COURSE_NAME=Computer Packages
+COURSE_DURATION_MONTHS=2
+
+# WhatsApp
+WHATSAPP_ENABLED=true
+WHATSAPP_COUNTRY_CODE=254
 ```
 
-### 2. Update `.env`
-```
-DATABASE_URL=postgresql://user:password@host:5432/dbname
+### Generate Secret Key
+
+```python
+python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-### 3. Update `models.py` (if needed)
-SQLite is mostly compatible with PostgreSQL, but for production consider using Flask-Migrate:
+---
 
-```bash
-pip install Flask-Migrate
-```
+## Post-Deployment Checklist
+
+- [ ] Change default admin password
+- [ ] Test login
+- [ ] Add test student
+- [ ] Mark attendance
+- [ ] Record assessment
+- [ ] Generate certificate
+- [ ] Test email (Gmail integration)
+- [ ] Test WhatsApp
+- [ ] Verify database persistence
+- [ ] Set up regular backups
 
 ---
 
 ## Troubleshooting
 
-### "Module not found"
-```bash
-pip install -r requirements.txt
-```
+### App Won't Start
 
-### "Port already in use"
-Change port in `app.py`:
-```python
-app.run(debug=True, host='0.0.0.0', port=5001)
-```
+**Check logs:**
+- Render: Dashboard → Logs tab
+- PythonAnywhere: Web tab → Error log
 
-### "Database locked"
-Delete `instance/studentmanager.db` and restart:
-```bash
-python app.py
-```
+**Common issues:**
+- Missing dependencies: `pip install -r requirements.txt`
+- Environment variables not set
+- Database connection failed
 
-### Static files not loading
-Check `static` folder permissions and ensure paths are correct.
+### Database Errors
+
+**SQLite (local):**
+- Delete `instance/studentmanager.db`
+- Restart app
+
+**PostgreSQL (production):**
+- Check `DATABASE_URL` format
+- Verify database exists
+- Run migrations: `flask db upgrade`
+
+### Email Not Working
+
+**Gmail integration:**
+- No setup needed - uses your browser
+- Just click "Send via Gmail" button
+
+**Server-side email (optional):**
+- Need Gmail App Password
+- Enable 2FA first
+- Generate App Password at: https://myaccount.google.com/apppasswords
+
+### Static Files Not Loading
+
+- Clear browser cache (Ctrl+F5)
+- Check file paths in templates
+- Verify `static` folder uploaded
 
 ---
 
-## Need Help?
+## Backup Strategy
 
-- Flask Docs: https://flask.palletsprojects.com/
-- PythonAnywhere Forums: https://help.pythonanywhere.com/
-- Render Docs: https://render.com/docs
+### Manual Backup
+
+**SQLite:**
+```bash
+# Windows
+copy instance\studentmanager.db backups\studentmanager_%date%.db
+
+# Linux/Mac
+cp instance/studentmanager.db backups/studentmanager_$(date +%Y%m%d).db
+```
+
+**PostgreSQL (Render):**
+- Dashboard → Database → Backups
+- Download backup file
+
+### Automated Backup
+
+Set up weekly reminders to:
+1. Export data to Excel (Reports → Export)
+2. Download database backup
+3. Store securely
+
+---
+
+## Support Resources
+
+- **Flask Docs:** https://flask.palletsprojects.com/
+- **Render Docs:** https://render.com/docs
+- **PythonAnywhere Help:** https://help.pythonanywhere.com/
+- **Railway Docs:** https://docs.railway.app
+
+---
+
+**Need Help?** Contact the system administrator.
