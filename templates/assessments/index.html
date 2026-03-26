@@ -17,19 +17,22 @@
 
 <!-- Certificate Eligibility Alert -->
 {% set avg_score = student.average_score %}
-{% if avg_score >= 50 %}
+{% set att_rate = student.attendance_rate %}
+{% if avg_score >= 50 and att_rate >= 50 %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="bi bi-check-circle-fill"></i>
     <strong>Certificate Eligible!</strong>
-    Average Score: <strong>{{ avg_score }}%</strong> - This student qualifies for certificate generation.
+    Average Score: <strong>{{ avg_score }}%</strong> | Attendance: <strong>{{ att_rate }}%</strong> - This student qualifies for certificate generation.
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 {% else %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <i class="bi bi-exclamation-triangle-fill"></i>
-    <strong>Not Yet Eligible for Certificate</strong>
-    Average Score: <strong>{{ avg_score }}%</strong> - Student needs minimum <strong>50%</strong> to qualify for certificate.
-    <a href="{{ url_for('assessments.add', student_id=student.id) }}" class="alert-link">Add more assessments</a> to improve the score.
+    <strong>Not Yet Eligible for Certificate</strong><br>
+    {% if avg_score < 50 %}Average Score: <strong>{{ avg_score }}%</strong> (Needs 50%)<br>{% endif %}
+    {% if att_rate < 50 %}Attendance: <strong>{{ att_rate }}%</strong> (Needs 50%){% endif %}
+    Student needs minimum <strong>50%</strong> in both categories to qualify for certificate.
+    <a href="{{ url_for('assessments.add', student_id=student.id) }}" class="alert-link">Add more assessments</a> or mark attendance to improve.
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 {% endif %}

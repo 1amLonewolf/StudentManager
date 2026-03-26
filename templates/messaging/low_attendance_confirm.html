@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Send Attendance Alerts{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Send Attendance Alerts</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Threshold:</strong> {{ threshold }}%<br>
+                    Students with attendance below {{ threshold }}% will receive an email alert.
+                </div>
+
+                <h6 class="mb-3">Students to be notified ({{ students|length }}):</h6>
+
+                {% if students %}
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Attendance Rate</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.name }}</td>
+                                <td>
+                                    <span class="badge bg-danger">{{ student.attendance_rate }}%</span>
+                                </td>
+                                <td>{{ student.email or 'No email' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <form method="POST">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-send"></i> Send {{ students|length }} Alert(s)
+                        </button>
+                        <a href="{{ url_for('messaging.index') }}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i>
+                    <strong>No students below threshold!</strong><br>
+                    All active students have attendance above {{ threshold }}%.
+                </div>
+                <a href="{{ url_for('messaging.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Messaging
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

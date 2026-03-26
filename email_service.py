@@ -128,29 +128,36 @@ Accounts Department
 def send_attendance_alert(student, recipient_email):
     """Send low attendance alert email"""
     subject = f'Attendance Alert - {student.name}'
-    
+
+    # Calculate attendance stats
+    classes_attended = sum(1 for a in student.attendances if a.present)
+    total_classes = len(student.attendances)
+
     text_body = f'''Dear {student.name},
 
-This is to inform you that your current attendance rate is {student.attendance_rate}%, which is below the required 70%.
+This is to inform you that your current attendance rate is {student.attendance_rate}%, which is below the required 50%.
 
-Please attend classes regularly to complete your course successfully.
+Please attend classes regularly to complete your course successfully and qualify for your certificate.
 
 Current Statistics:
 - Attendance Rate: {student.attendance_rate}%
-- Classes Attended: {sum(1 for a in student.attendances if a.present)}
-- Total Classes: {len(student.attendances)}
+- Minimum Required: 50%
+- Classes Attended: {classes_attended}
+- Total Classes: {total_classes}
 
 If you have any challenges affecting your attendance, please contact the administration.
 
 Best regards,
 Course Administrator
 '''
-    
+
     html_body = render_template(
         'emails/attendance_alert.html',
-        student=student
+        student=student,
+        classes_attended=classes_attended,
+        total_classes=total_classes
     )
-    
+
     return send_email(subject, recipient_email, text_body, html_body)
 
 def send_certificate_email(student, certificate, recipient_email):

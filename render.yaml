@@ -10,7 +10,9 @@ services:
       - key: SECRET_KEY
         value: "0581d72998b3e8ff6e47b920ea13a53c6c3ed5b9905807ccb2d8890cfd58dd8c"
       - key: DATABASE_URL
-        value: "sqlite:////app/instance/studentmanager.db"
+        fromDatabase:
+          name: studentmanager-db
+          property: connectionString
       - key: FLASK_ENV
         value: production
       - key: MAIL_SERVER
@@ -43,3 +45,7 @@ services:
         value: static/colmac_logo.png
       - key: STUDENTS_PER_PAGE
         value: 10
+
+databases:
+  - name: studentmanager-db
+    plan: free

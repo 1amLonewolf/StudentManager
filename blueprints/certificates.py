@@ -68,10 +68,16 @@ def generate():
                 flash(f'Certificate already exists for {student.name}', 'warning')
                 continue
 
-            # ENFORCE 50% MINIMUM REQUIREMENT
+            # ENFORCE 50% MINIMUM AVERAGE SCORE REQUIREMENT
             avg_score = student.average_score
             if avg_score < 50:
                 not_eligible.append(f'{student.name} (Average: {avg_score:.1f}%)')
+                continue
+
+            # ENFORCE 50% MINIMUM ATTENDANCE REQUIREMENT
+            attendance_rate = student.attendance_rate
+            if attendance_rate < 50:
+                not_eligible.append(f'{student.name} (Attendance: {attendance_rate:.1f}%)')
                 continue
 
             # ENFORCE FULL PAYMENT REQUIREMENT
@@ -138,6 +144,9 @@ def generate():
     # FILTER OUT students with average score < 50%
     eligible_students = [s for s in eligible_students if s.average_score >= 50]
 
+    # FILTER OUT students with attendance < 50%
+    eligible_students = [s for s in eligible_students if s.attendance_rate >= 50]
+
     # FILTER OUT students who haven't paid in full
     from flask import current_app
     course_fee = current_app.config.get('COURSE_FEE', 4000)
@@ -161,6 +170,12 @@ def download(id):
         balance = course_fee - total_paid
         flash(f'⚠️ Cannot download certificate. Outstanding balance: KES {balance:,} (Paid: KES {total_paid:,} / {course_fee:,})', 'warning')
         return redirect(url_for('payments.index'))
+    
+    # CHECK ATTENDANCE RATE (must be >= 50%)
+    attendance_rate = student.attendance_rate
+    if attendance_rate < 50:
+        flash(f'⚠️ Cannot download certificate. Attendance too low: {attendance_rate:.1f}% (Minimum required: 50%)', 'warning')
+        return redirect(url_for('attendance.index'))
     
     import os
     if certificate.pdf_path and os.path.exists(certificate.pdf_path):

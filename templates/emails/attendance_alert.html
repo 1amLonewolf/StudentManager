@@ -24,24 +24,28 @@
             <p>Dear <strong>{{ student.name }}</strong>,</p>
             
             <div class="alert-box">
-                <p><strong>Important:</strong> Your current attendance rate is <strong>{{ student.attendance_rate }}%</strong>, which is below the required 70%.</p>
+                <p><strong>Important:</strong> Your current attendance rate is <strong>{{ student.attendance_rate }}%</strong>, which is below the required <strong>50%</strong> for certificate eligibility.</p>
             </div>
-            
-            <p>Regular attendance is crucial for successfully completing your course. Please make every effort to attend all remaining classes.</p>
+
+            <p>Regular attendance is crucial for successfully completing your course. <strong>You must maintain at least 50% attendance to qualify for your certificate.</strong> Please make every effort to attend all remaining classes.</p>
             
             <div class="stats">
                 <h3>Your Current Statistics:</h3>
                 <div class="stat-row">
                     <span>Attendance Rate:</span>
-                    <strong style="color: {{ 'red' if student.attendance_rate < 70 else 'green' }};">{{ student.attendance_rate }}%</strong>
+                    <strong style="color: {{ 'red' if student.attendance_rate < 50 else 'green' }};">{{ student.attendance_rate }}%</strong>
+                </div>
+                <div class="stat-row">
+                    <span>Minimum Required:</span>
+                    <strong style="color: red;">50%</strong>
                 </div>
                 <div class="stat-row">
                     <span>Classes Attended:</span>
-                    <strong>{{ sum(1 for a in student.attendances if a.present) }}</strong>
+                    <strong>{{ classes_attended }}</strong>
                 </div>
                 <div class="stat-row">
                     <span>Total Classes:</span>
-                    <strong>{{ student.attendances|length }}</strong>
+                    <strong>{{ total_classes }}</strong>
                 </div>
             </div>
             

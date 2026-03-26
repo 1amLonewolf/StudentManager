@@ -113,19 +113,41 @@ def bulk_email():
     flash(f'Emails sent to {count} students', 'success')
     return redirect(url_for('messaging.index'))
 
-@messaging_bp.route('/low-attendance-alerts')
+@messaging_bp.route('/low-attendance-alerts', methods=['GET', 'POST'])
 @login_required
 def send_low_attendance_alerts():
-    """Send attendance alerts to all students with low attendance"""
+    """Send attendance alerts to students with low attendance"""
     from email_service import send_attendance_alert
-    
-    low_attendance_students = [s for s in Student.query.filter_by(status='active').all() if s.attendance_rate < 70]
-    
-    count = 0
-    for student in low_attendance_students:
-        if student.email:
-            send_attendance_alert(student, student.email)
-            count += 1
-    
-    flash(f'Attendance alerts sent to {count} students with low attendance', 'success')
-    return redirect(url_for('messaging.index'))
+    import logging
+
+    # Get threshold from query param (default 50%)
+    threshold = request.args.get('threshold', 50, type=int)
+
+    if request.method == 'POST':
+        # Send alerts to students below threshold
+        low_attendance_students = [s for s in Student.query.filter_by(status='active').all() if s.attendance_rate < threshold]
+
+        count = 0
+        sent_emails = []
+        for student in low_attendance_students:
+            if student.email:
+                send_attendance_alert(student, student.email)
+                count += 1
+                sent_emails.append(f'{student.name} ({student.email})')
+
+        # Log sent emails
+        if sent_emails:
+            logging.info(f'Attendance alerts sent to: {", ".join(sent_emails)}')
+            flash(f'✅ Attendance alerts sent to {count} students:<br>' + 
+                  f'<small>{"<br>".join(sent_emails)}</small>', 'success')
+        else:
+            flash(f'ℹ️ No students found with attendance below {threshold}%', 'info')
+        
+        return redirect(url_for('messaging.index'))
+
+    # GET request - show confirmation page
+    low_attendance_students = [s for s in Student.query.filter_by(status='active').all() if s.attendance_rate < threshold]
+
+    return render_template('messaging/low_attendance_confirm.html',
+                         students=low_attendance_students,
+                         threshold=threshold)
