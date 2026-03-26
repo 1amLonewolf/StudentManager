@@ -189,21 +189,9 @@ class Payment(db.Model):
     reference = db.Column(db.String(100))  # Transaction reference
     notes = db.Column(db.Text)
     recorded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
+
     def __repr__(self):
         return f'<Payment {self.student_id} - {self.amount}>'
-
-class SMSLog(db.Model):
-    """Track sent SMS messages"""
-    id = db.Column(db.Integer, primary_key=True)
-    recipient = db.Column(db.String(20), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, sent, failed
-    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
-    error_message = db.Column(db.Text)
-    
-    def __repr__(self):
-        return f'<SMS {self.recipient} - {self.status}>'
 
 # Initialize login_manager
 def init_login_manager(app):

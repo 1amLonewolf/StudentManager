@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from config import Config
-from models import db, login_manager, migrate, User, Student, Course, Attendance, Assessment, Certificate, Payment, SMSLog, init_login_manager
+from models import db, login_manager, migrate, User, Student, Course, Attendance, Assessment, Certificate, Payment, init_login_manager
 from blueprints import auth_bp, main_bp, students_bp, attendance_bp, assessments_bp, certificates_bp, payments_bp, reports_bp, messaging_bp, users_bp
 
 app = Flask(__name__)

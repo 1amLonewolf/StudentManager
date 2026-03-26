@@ -48,10 +48,5 @@ class Config:
     OUTPUT_CERTIFICATE_PATH = os.environ.get('OUTPUT_CERTIFICATE_PATH', 'static/certificates/generated')
     COLLEGE_LOGO_PATH = os.environ.get('COLLEGE_LOGO_PATH', 'static/colmac_logo.png')
 
-    # SMS settings (Twilio - Optional, paid)
-    TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
-    TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
-    TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', '')
-
     # Pagination
     STUDENTS_PER_PAGE = int(os.environ.get('STUDENTS_PER_PAGE', 10))

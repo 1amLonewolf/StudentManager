@@ -4,7 +4,7 @@ Handles email and WhatsApp messaging
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import Student, Payment, SMSLog
+from models import Student, Payment
 from datetime import datetime
 
 messaging_bp = Blueprint('messaging', __name__, url_prefix='/messaging')

@@ -78,11 +78,7 @@
                         'Dear Student/Parent,\n\n' +
                         'This is to inform you that the student\'s attendance is below the required 50%.\n\n' +
                         'Please ensure regular attendance to qualify for the certificate.\n\n' +
-                        'Students with low attendance:\n' +
-                        {% for student in students %}
-                        {% if student.email %}'- {{ student.name }} ({{ student.attendance_rate }}%)\n',{% endif %}
-                        {% endfor %}
-                        '\nBest regards,\nCOLMAC Computer College'
+                        'Best regards,\nCOLMAC Computer College'
                     );
                     
                     const mailtoUrl = `mailto:${emails.join(',')}?subject=${subject}&body=${body}`;
