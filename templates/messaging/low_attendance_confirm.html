@@ -42,16 +42,64 @@
                     </table>
                 </div>
 
-                <form method="POST">
+                <form method="POST" style="display: none;">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-send"></i> Send {{ students|length }} Alert(s)
+                            <i class="bi bi-send"></i> Send {{ students|length }} Alert(s) via Server
                         </button>
                         <a href="{{ url_for('messaging.index') }}" class="btn btn-secondary">
                             Cancel
                         </a>
                     </div>
                 </form>
+
+                <div class="d-flex gap-2">
+                    <a href="#" onclick="sendBulkGmail(); return false;" class="btn btn-danger">
+                        <i class="bi bi-google"></i> Send via Gmail ({{ students|length }} alerts)
+                    </a>
+                    <a href="#" onclick="sendBulkMailto(); return false;" class="btn btn-info">
+                        <i class="bi bi-send-fill"></i> Send via Email App ({{ students|length }} alerts)
+                    </a>
+                    <a href="{{ url_for('messaging.index') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+                <script>
+                function sendBulkMailto() {
+                    const emails = [
+                        {% for student in students %}
+                        {% if student.email %}'{{ student.email }}',{% endif %}
+                        {% endfor %}
+                    ];
+                    
+                    const subject = encodeURIComponent('Attendance Alert - COLMAC Computer College');
+                    const body = encodeURIComponent(
+                        'Dear Student/Parent,\n\n' +
+                        'This is to inform you that the student\'s attendance is below the required 50%.\n\n' +
+                        'Please ensure regular attendance to qualify for the certificate.\n\n' +
+                        'Students with low attendance:\n' +
+                        {% for student in students %}
+                        {% if student.email %}'- {{ student.name }} ({{ student.attendance_rate }}%)\n',{% endif %}
+                        {% endfor %}
+                        '\nBest regards,\nCOLMAC Computer College'
+                    );
+                    
+                    const mailtoUrl = `mailto:${emails.join(',')}?subject=${subject}&body=${body}`;
+                    window.open(mailtoUrl, '_blank');
+                }
+
+                function sendBulkGmail() {
+                    const emails = [
+                        {% for student in students %}
+                        {% if student.email %}'{{ student.email }}',{% endif %}
+                        {% endfor %}
+                    ];
+                    
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emails.join(','))}&su=${encodeURIComponent('Attendance Alert - COLMAC Computer College')}&body=${encodeURIComponent('Dear Student/Parent,\n\nThis is to inform you that the student\'s attendance is below the required 50%.\n\nPlease ensure regular attendance to qualify for the certificate.\n\nBest regards,\nCOLMAC Computer College')}`;
+                    window.open(gmailUrl, '_blank');
+                }
+                </script>
                 {% else %}
                 <div class="alert alert-success">
                     <i class="bi bi-check-circle"></i>

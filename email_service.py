@@ -22,23 +22,32 @@ def send_async_email(app, msg):
 def send_email(subject, recipients, text_body, html_body):
     """
     Send email to one or more recipients
-    
+
     Args:
         subject: Email subject
         recipients: List of email addresses or single string
         text_body: Plain text version
         html_body: HTML version (optional)
-    
+
     Returns:
-        bool: True if sent successfully
+        bool: True if sent successfully, False otherwise
     """
-    if not current_app.config.get('MAIL_USERNAME'):
-        current_app.logger.info('Email not configured - skipping send')
-        return False
+    # Debug: Log email configuration
+    current_app.logger.info(f'Email config - Server: {current_app.config.get("MAIL_SERVER")}, Port: {current_app.config.get("MAIL_PORT")}, Username: {current_app.config.get("MAIL_USERNAME")}, TLS: {current_app.config.get("MAIL_USE_TLS")}')
     
+    if not current_app.config.get('MAIL_USERNAME'):
+        current_app.logger.warning('Email not configured - MAIL_USERNAME not set')
+        return False
+
     if isinstance(recipients, str):
         recipients = [recipients]
-    
+
+    # Validate email addresses
+    for recipient in recipients:
+        if '@' not in recipient:
+            current_app.logger.warning(f'Invalid email address: {recipient}')
+            return False
+
     msg = Message(
         subject,
         sender=current_app.config.get('MAIL_DEFAULT_SENDER'),
@@ -46,14 +55,21 @@ def send_email(subject, recipients, text_body, html_body):
     )
     msg.body = text_body
     msg.html = html_body
-    
-    # Send asynchronously
-    from app import app
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    
-    current_app.logger.info(f'Email queued to {recipients}')
-    return True
+
+    # Send synchronously with error handling
+    try:
+        from app import app
+        with app.app_context():
+            from app import mail
+            current_app.logger.info(f'Attempting to send email to {recipients}...')
+            mail.send(msg)
+        current_app.logger.info(f'Email sent successfully to {recipients}')
+        return True
+    except Exception as e:
+        current_app.logger.error(f'Failed to send email to {recipients}: {str(e)}')
+        import traceback
+        current_app.logger.error(f'Email traceback: {traceback.format_exc()}')
+        return False
 
 # ============== Email Templates ==============
 

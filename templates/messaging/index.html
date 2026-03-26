@@ -20,16 +20,15 @@
                 <h5 class="mb-0"><i class="bi bi-envelope"></i> Email Messaging</h5>
             </div>
             <div class="card-body">
-                <p class="text-muted">Send emails to individual students or in bulk. Free via Gmail SMTP.</p>
+                <p class="text-muted">Send emails via Gmail or your default Email App. No configuration needed!</p>
                 <ul class="list-unstyled">
-                    <li><i class="bi bi-check-circle text-success"></i> Welcome emails</li>
-                    <li><i class="bi bi-check-circle text-success"></i> Attendance alerts</li>
-                    <li><i class="bi bi-check-circle text-success"></i> Monthly progress reports</li>
-                    <li><i class="bi bi-check-circle text-success"></i> Payment receipts</li>
-                    <li><i class="bi bi-check-circle text-success"></i> Certificate notifications</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Send via Gmail (browser)</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Send via Email App (Outlook, Mail, etc.)</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Bulk attendance alerts</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Pre-filled messages</li>
                 </ul>
-                <div class="alert alert-info">
-                    <small><i class="bi bi-info-circle"></i> Configure email settings in <code>.env</code> file</small>
+                <div class="alert alert-success">
+                    <small><i class="bi bi-lightning"></i> <strong>No server setup required!</strong> Emails send from your own Gmail account</small>
                 </div>
             </div>
         </div>
@@ -98,8 +97,13 @@
                                 <ul class="dropdown-menu">
                                     {% if student.email %}
                                     <li>
-                                        <a class="dropdown-item" href="{{ url_for('messaging.send_email', student_id=student.id) }}">
-                                            <i class="bi bi-envelope text-primary"></i> Send Email
+                                        <a class="dropdown-item" href="#" onclick="openGmail('{{ student.email }}', '{{ student.name }}'); return false;">
+                                            <i class="bi bi-google text-danger"></i> Send via Gmail
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="mailto:{{ student.email }}?subject=COLMAC Computer College&body=Dear {{ student.name }},%0D%0A%0D%0A" target="_blank">
+                                            <i class="bi bi-send text-info"></i> Open Email App
                                         </a>
                                     </li>
                                     {% endif %}
@@ -146,12 +150,18 @@ function sendBoth(studentId, studentName) {
     // Open email in new tab
     const emailUrl = `/messaging/email/${studentId}`;
     window.open(emailUrl, '_blank');
-    
+
     // Open WhatsApp after a short delay
     setTimeout(() => {
         const whatsappUrl = `/messaging/whatsapp/${studentId}?message=${encodeURIComponent('Hello ' + studentName)}`;
         window.open(whatsappUrl, '_blank');
     }, 500);
+}
+
+function openGmail(recipient, studentName) {
+    // Open Gmail compose with pre-filled details
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent('COLMAC Computer College - Message')}&body=${encodeURIComponent('Dear ' + studentName + ',\\n\\n')}`;
+    window.open(gmailUrl, '_blank');
 }
 </script>
 {% endblock %}
