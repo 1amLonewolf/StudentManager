@@ -6,7 +6,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from models import db, Student, Course
 from datetime import datetime
+import logging
 
+logger = logging.getLogger(__name__)
 students_bp = Blueprint('students', __name__, url_prefix='/students')
 
 @students_bp.route('')
@@ -111,8 +113,18 @@ def edit(id):
 @students_bp.route('/<int:id>/delete', methods=['POST'])
 @login_required
 def delete(id):
-    student = Student.query.get_or_404(id)
-    db.session.delete(student)
-    db.session.commit()
-    flash(f'Student {student.name} deleted successfully!', 'success')
+    try:
+        student = Student.query.get_or_404(id)
+        student_name = student.name
+        
+        # Delete the student (cascade will delete related records)
+        db.session.delete(student)
+        db.session.commit()
+        
+        flash(f'Student {student_name} deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting student: {str(e)}', 'danger')
+        logger.error(f'Failed to delete student {id}: {e}')
+    
     return redirect(url_for('.index'))

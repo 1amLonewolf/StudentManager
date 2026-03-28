@@ -42,6 +42,13 @@ app.register_blueprint(users_bp)
 # Ensure certificate output directory exists
 os.makedirs(app.config['OUTPUT_CERTIFICATE_PATH'], exist_ok=True)
 
+# ============== Database Session Management ==============
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    """Remove database session at end of request to ensure proper cleanup"""
+    db.session.remove()
+
 # ============== Context Processors ==============
 
 @app.context_processor
