@@ -4,9 +4,12 @@ from pathlib import Path
 
 load_dotenv()
 
+# Get the absolute path to the project directory
+BASE_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-change-in-production'
-    
+
     # Database configuration
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if DATABASE_URL:
@@ -14,9 +17,11 @@ class Config:
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
         # Use SQLite in instance folder with absolute path
-        instance_path = Path(__file__).parent / 'instance'
+        # This ensures consistent database location regardless of where app is run from
+        instance_path = BASE_DIR / 'instance'
         instance_path.mkdir(exist_ok=True)
-        SQLALCHEMY_DATABASE_URI = f'sqlite:///{instance_path}/studentmanager.db'
+        db_path = instance_path / 'studentmanager.db'
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path.as_posix()}'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

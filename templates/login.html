@@ -28,6 +28,21 @@
     .login-form {
         text-align: left;
     }
+    .credit-link {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        color: #6c757d !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    .credit-link:hover {
+        background-color: #1e3a5f !important;
+        color: #fff !important;
+        text-decoration: none;
+        box-shadow: 0 0 15px rgba(30, 58, 95, 0.4) !important;
+    }
 </style>
 {% endblock %}
 
@@ -66,6 +81,14 @@
                     </div>
                 </form>
             </div>
+        </div>
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="bi bi-code-slash"></i> Powered by 
+                <a href="https://marsden-maima-portfolio.vercel.app/" target="_blank" class="credit-link">
+                    @1amLonewolf
+                </a>
+            </small>
         </div>
     </div>
 </div>

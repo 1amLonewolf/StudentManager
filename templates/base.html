@@ -16,8 +16,23 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        .credit-link {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+        .credit-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff !important;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.5);
+        }
+    </style>
 </head>
 <body>
     {% if current_user.is_authenticated %}
@@ -96,9 +111,12 @@
                     </small>
                 </div>
                 <div class="text-center py-3 px-2">
-                    <a href="https://github.com/1amLonewolf" target="_blank" class="text-white-50 text-decoration-none small">
-                        <i class="bi bi-github"></i> Built by @1amLonewolf
-                    </a>
+                    <span class="text-white-50 small">
+                        <i class="bi bi-code-slash"></i> Powered by 
+                        <a href="https://marsden-maima-portfolio.vercel.app/" target="_blank" class="credit-link text-white-50">
+                            @1amLonewolf
+                        </a>
+                    </span>
                 </div>
             </div>
         </div>
